@@ -1,0 +1,3 @@
+# Tooling for Claude Code, not part of the website
+.claude
+.gitignore
