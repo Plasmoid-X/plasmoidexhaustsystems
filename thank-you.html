@@ -8,25 +8,30 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/style.css" />
+<script>document.documentElement.classList.add("js");</script>
 </head>
 <body>
+
+<a class="skip-link" href="#main">Skip to content</a>
 
 <header class="site-header">
   <div class="shell nav">
     <a href="/" class="brand"><span class="brand-mark"></span> PLASMOID X</a>
-    <ul class="nav-links">
-      <li><a href="/">Home</a></li>
-      <li><a href="/technology.html">Technology</a></li>
-      <li><a href="/product.html">Product</a></li>
-      <li><a href="/about.html">About</a></li>
-      <li><a href="/process.html">Process</a></li>
-      <li><a href="/enquiries.html" class="nav-cta">Enquire</a></li>
-    </ul>
-    <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">&#9776;</button>
+    <nav id="site-nav" aria-label="Main">
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/technology.html">Technology</a></li>
+        <li><a href="/product.html">Product</a></li>
+        <li><a href="/about.html">About</a></li>
+        <li><a href="/process.html">Process</a></li>
+        <li><a href="/enquiries.html" class="nav-cta">Enquire</a></li>
+      </ul>
+    </nav>
   </div>
 </header>
 
-<main>
+<main id="main">
   <section class="hero" style="min-height: 60vh; display: flex; align-items: center;">
     <div class="shell">
       <span class="section-label">Message Sent</span>
@@ -40,7 +45,7 @@
 <footer class="site-footer">
   <div class="shell">
     <div class="footer-bottom">
-      <span>&copy; <span id="year"></span> Plasmoid X. All rights reserved.</span>
+      <span>&copy; <span id="year">2026</span> Plasmoid X. All rights reserved.</span>
     </div>
   </div>
 </footer>
