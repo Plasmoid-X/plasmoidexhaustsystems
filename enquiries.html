@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Enquire | Plasmoid X</title>
+<meta name="description" content="Get in touch about a Plasmoid X exhaust retrofit for your yacht." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="shell nav">
+    <a href="/" class="brand"><span class="brand-mark"></span> PLASMOID X</a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/technology.html">Technology</a></li>
+      <li><a href="/product.html">Product</a></li>
+      <li><a href="/about.html">About</a></li>
+      <li><a href="/process.html">Process</a></li>
+      <li><a href="/enquiries.html" class="nav-cta active">Enquire</a></li>
+    </ul>
+    <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero" style="padding-bottom: 4rem;">
+    <div class="shell">
+      <span class="section-label">Get In Touch</span>
+      <h1>Ready to talk retrofit?</h1>
+      <p class="lead">Tell us about your vessel and we'll reply directly.</p>
+    </div>
+  </section>
+
+  <section class="section-alt">
+    <div class="shell grid-2">
+      <div>
+        <form id="enquiry-form" class="form-grid" action="https://api.web3forms.com/submit" method="POST">
+          <input type="hidden" name="access_key" value="24b9e527-d910-4e8b-a1b2-ea3798cc89fc" />
+          <input type="hidden" name="subject" value="New enquiry from plasmoidx.co.uk" />
+          <input type="hidden" name="from_name" value="Plasmoid X website" />
+          <input type="hidden" name="redirect" value="https://plasmoidx.co.uk/thank-you.html" />
+          <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" />
+
+          <div class="field">
+            <label for="name">Name *</label>
+            <input type="text" id="name" name="Name" required />
+          </div>
+
+          <div class="field">
+            <label for="role">I am a... *</label>
+            <select id="role" name="Role" required>
+              <option value="">Select one</option>
+              <option>Yacht Owner</option>
+              <option>Captain</option>
+              <option>Engineer</option>
+              <option>Yacht Management Company</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="vessel">Vessel / Company name</label>
+            <input type="text" id="vessel" name="Vessel or Company" />
+          </div>
+
+          <div class="field">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" name="Phone" />
+          </div>
+
+          <div class="field">
+            <label for="message">Message *</label>
+            <textarea id="message" name="Message" required placeholder="Tell us about your vessel and what you're looking for..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-dark" style="justify-self: start;">Send enquiry</button>
+          <p class="form-note">We'll only use these details to respond to your enquiry.</p>
+        </form>
+      </div>
+
+      <div>
+        <div class="card" style="background: var(--paper); border: none;">
+          <h3>What happens next</h3>
+          <p>Your enquiry goes straight to the Plasmoid X team. We'll reply to talk through your vessel and what a retrofit would involve. You can see every step on the <a href="/process.html">Process page</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="shell">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">PLASMOID X</div>
+        <p style="margin-top: 0.5rem; max-width: 320px; font-size: 0.9rem;">Exhaust retrofits for cleaner, more efficient yachts.</p>
+      </div>
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/technology.html">Technology</a></li>
+        <li><a href="/product.html">Product</a></li>
+        <li><a href="/about.html">About</a></li>
+        <li><a href="/process.html">Process</a></li>
+        <li><a href="/enquiries.html">Enquire</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; <span id="year"></span> Plasmoid X. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>
