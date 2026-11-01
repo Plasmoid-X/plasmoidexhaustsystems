@@ -403,12 +403,16 @@ section { padding: 5.5rem 0; }
 .founder-photo.has-img { padding: 0; overflow: hidden; background: none; }
 .founder-photo.has-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
-/* Stock photography */
+/* Stock photography. Each page sets its own picture on the section:
+   style="--hero-img: url(...); --hero-pos: center 40%" */
 .hero-photo {
   background:
-    linear-gradient(160deg, rgba(18, 53, 36, 0.92) 0%, rgba(45, 132, 138, 0.78) 60%, rgba(60, 152, 185, 0.55) 100%),
-    url("https://images.unsplash.com/photo-1781872324499-e51350ed640e?w=1800&q=70&auto=format&fit=crop") center 40% / cover no-repeat;
+    linear-gradient(160deg, rgba(18, 53, 36, 0.9) 0%, rgba(18, 53, 36, 0.72) 45%, rgba(45, 132, 138, 0.35) 100%),
+    var(--hero-img) var(--hero-pos, center) / cover no-repeat,
+    var(--dark-green);
 }
+.photo-credit a { color: rgba(255,255,255,0.75); text-decoration: underline; }
+.photo-credit a:hover { color: var(--uranian-blue); }
 .photo-frame { margin: 0; border-radius: var(--radius); overflow: hidden; aspect-ratio: 4 / 3; }
 .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
 
