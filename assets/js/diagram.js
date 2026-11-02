@@ -38,7 +38,7 @@
   const FLOWS = [
     // exhaust first, so the divider can be cleared before the intake is drawn
     { radius: exhaustR, from: 662, to: 130, drift: -22, spin: -2.4, count: 110,
-      rgb: "196, 18, 24", front: 0.95, back: 0.4, width: 4.4,
+      rgb: "196, 18, 24", front: 0.62, back: 0.24, width: 4.4,
       inside: ORANGE, outside: DIVIDER },
     { radius: intakeR, from: 150, to: 632, drift: 26, spin: 3, count: 34,
       rgb: "14, 92, 186", front: 0.95, back: 0.3, width: 3,
