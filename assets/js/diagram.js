@@ -20,13 +20,31 @@
   const intakeR = (y) => Math.max(
     0.8 * sphereR(y, TOP, 79), 0.8 * sphereR(y, BOT, 79), inTube(y) ? 11 : 0);
   const exhaustR = (y) => Math.max(
-    sphereR(y, TOP, 96), sphereR(y, BOT, 96), inTube(y) ? 28 : 0);
+    sphereR(y, TOP, 96), sphereR(y, BOT, 96), inTube(y) ? 25.5 : 0);
 
   const FLOWS = [
     { radius: intakeR, from: 150, to: 632, drift: 13, spin: 1.5, count: 34,
-      rgb: "235, 249, 255", front: 0.95, back: 0.28, width: 3 },
-    { radius: exhaustR, from: 662, to: 130, drift: -11, spin: -1.2, count: 30,
-      rgb: "255, 222, 190", front: 0.85, back: 0.14, width: 2.6 },
+      rgb: "14, 92, 186", front: 0.95, back: 0.3, width: 3,
+      // stays in the blue chamber of each sphere and the tube's blue core
+      clip: (ctx) => {
+        ctx.arc(TOP.x, TOP.y, 79, 0, Math.PI * 2);
+        ctx.moveTo(BOT.x + 79, BOT.y);
+        ctx.arc(BOT.x, BOT.y, 79, 0, Math.PI * 2);
+        ctx.rect(424, 290, 27, 200);
+      } },
+    { radius: exhaustR, from: 662, to: 130, drift: -11, spin: -1.2, count: 64,
+      rgb: "196, 18, 24", front: 0.95, back: 0.35, width: 3,
+      // stays in the orange shell of each sphere and the tube's orange sides
+      clip: (ctx) => {
+        for (const c of [TOP, BOT]) {
+          ctx.moveTo(c.x + 104, c.y);
+          ctx.arc(c.x, c.y, 104, 0, Math.PI * 2, false);
+          ctx.moveTo(c.x + 87, c.y);
+          ctx.arc(c.x, c.y, 87, 0, Math.PI * 2, true);
+        }
+        ctx.rect(405, 300, 12, 180);
+        ctx.rect(457, 300, 11, 180);
+      } },
   ];
 
   function init(wrap) {
@@ -62,8 +80,21 @@
     function draw() {
       ctx.clearRect(0, 0, W, H);
       ctx.lineCap = "round";
+      for (const f of FLOWS) {
+        ctx.save();
+        ctx.beginPath();
+        f.clip(ctx);
+        ctx.clip();
+        for (const pt of particles) {
+          if (pt.f === f) drawStreak(pt);
+        }
+        ctx.restore();
+      }
+    }
+
+    function drawStreak(pt) {
       const SEGS = 22, ARC = 1.7;  // trail length in radians
-      for (const pt of particles) {
+      {
         const f = pt.f;
         let prev = null;
         for (let k = SEGS; k >= 0; k--) {
