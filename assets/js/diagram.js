@@ -26,14 +26,14 @@
     }
     ctx.rect(TOP.x - half, TOP.y, half * 2, BOT.y - TOP.y);
   }
-  const ORANGE = [104, 33];   // exhaust passage (outer)
+  const ORANGE = [114, 36];   // exhaust passage (outer), out to the thin outer wall
   const DIVIDER = [86, 18];   // wall between the passages
   const BLUE = [80, 14];      // intake passage (inner)
 
   const intakeR = (y) => Math.max(
     0.8 * sphereR(y, TOP, 79), 0.8 * sphereR(y, BOT, 79), inTube(y) ? 10 : 0);
   const exhaustR = (y) => Math.max(
-    sphereR(y, TOP, 95), sphereR(y, BOT, 95), inTube(y) ? 25.5 : 0);
+    sphereR(y, TOP, 101), sphereR(y, BOT, 101), inTube(y) ? 27 : 0);
 
   const FLOWS = [
     // exhaust first, so the divider can be cleared before the intake is drawn
@@ -91,6 +91,9 @@
           ctx.globalCompositeOperation = "destination-out";
           ctx.beginPath();
           body(ctx, ...f.outside);
+          // and off the intake pipes that cross the outer chamber
+          ctx.rect(316, 205, 46, 26);
+          ctx.rect(424, 632, 26, 54);
           ctx.fill();
         }
         ctx.restore();
@@ -100,7 +103,7 @@
       // half passes in front of the blue passage, so draw that half last.
       ctx.save();
       ctx.beginPath();
-      ctx.rect(TOP.x - ORANGE[1], TOP.y + BLUE[0], ORANGE[1] * 2, BOT.y - TOP.y - BLUE[0] * 2);
+      ctx.rect(TOP.x - ORANGE[1], TOP.y + BLUE[0] + 4, ORANGE[1] * 2, BOT.y - TOP.y - BLUE[0] * 2 - 8);
       ctx.clip();
       for (const pt of particles) {
         if (pt.f === FLOWS[0]) drawStreak(pt, (p) => p.depth > 0);

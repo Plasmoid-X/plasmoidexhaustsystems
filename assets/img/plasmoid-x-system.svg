@@ -76,17 +76,19 @@
   <rect x="139" y="472" width="32" height="10" rx="2"/>
 </g>
 <!-- inlet / outlet stubs into spheres -->
-<rect x="322" y="207" width="12" height="22" fill="#c3cbcf"/>
 <!-- exhaust out funnel -->
 <path d="M604 146 L644 146 L656 126 L592 126 Z" fill="url(#capH)" stroke="#7e888d" stroke-width="1.5"/>
 
 <!-- the vessel in cross-section: each layer is one continuous shape
      (two spheres joined by the neck), so the passages run through -->
 <path d="M319 223 a118 118 0 1 0 236 0 a118 118 0 1 0 -236 0ZM319 558 a118 118 0 1 0 236 0 a118 118 0 1 0 -236 0ZM397 223 V558 H477 V223Z" fill="url(#steelX)"/>
-<path d="M333 223 a104 104 0 1 0 208 0 a104 104 0 1 0 -208 0ZM333 558 a104 104 0 1 0 208 0 a104 104 0 1 0 -208 0ZM404 223 V558 H470 V223Z" fill="url(#shellX)"/>
+<path d="M323 223 a114 114 0 1 0 228 0 a114 114 0 1 0 -228 0ZM323 558 a114 114 0 1 0 228 0 a114 114 0 1 0 -228 0ZM401 223 V558 H473 V223Z" fill="url(#shellX)"/>
 <path d="M351 223 a86 86 0 1 0 172 0 a86 86 0 1 0 -172 0ZM351 558 a86 86 0 1 0 172 0 a86 86 0 1 0 -172 0ZM419 223 V558 H455 V223Z" fill="#eef3f5"/>
 <path d="M356 223 a81 81 0 1 0 162 0 a81 81 0 1 0 -162 0ZM356 558 a81 81 0 1 0 162 0 a81 81 0 1 0 -162 0ZM423 223 V558 H451 V223Z" fill="url(#chamberX)"/>
 <circle cx="437" cy="223" r="44" fill="url(#core)"/><ellipse cx="423" cy="207" rx="13" ry="8" fill="#fff" opacity=".55" transform="rotate(-30 423 207)"/><circle cx="437" cy="558" r="44" fill="url(#core)"/><ellipse cx="423" cy="542" rx="13" ry="8" fill="#fff" opacity=".55" transform="rotate(-30 423 542)"/>
+<!-- intake pipes pass through the outer (exhaust) chamber into the inner one -->
+<g class="pipe"><path d="M318 218 L360 218" class="p-outer"/><path d="M318 218 L360 218" class="p-body"/><path d="M318 218 L360 218" class="p-shine"/><path d="M318 218 L360 218" class="flow-in"/></g>
+<g class="pipe"><path d="M437 634 L437 684" class="p-outer"/><path d="M437 634 L437 684" class="p-body"/><path d="M437 634 L437 684" class="p-shine"/><path d="M437 634 L437 684" class="flow-in"/></g>
 
 <!-- ionizer -->
 <ellipse cx="155" cy="806" rx="80" ry="8" class="shadow"/>
