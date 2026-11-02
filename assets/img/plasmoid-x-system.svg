@@ -64,11 +64,11 @@
 
 <ellipse cx="437" cy="700" rx="100" ry="8" class="shadow"/>
 <!-- pipes (drawn first so fittings sit on top) -->
-<g class="pipe"><path d="M24 731 L84 731" class="p-outer"/><path d="M24 731 L84 731" class="p-body"/><path d="M24 731 L84 731" class="p-shine"/><path d="M24 731 L84 731" class="flow-in"/></g>
-<g class="pipe"><path d="M155 478 L155.0 242.0 Q155 218 179.0 218.0 L322 218" class="p-outer"/><path d="M155 478 L155.0 242.0 Q155 218 179.0 218.0 L322 218" class="p-body"/><path d="M155 478 L155.0 242.0 Q155 218 179.0 218.0 L322 218" class="p-shine"/><path d="M155 478 L155.0 242.0 Q155 218 179.0 218.0 L322 218" class="flow-in"/></g>
-<g class="pipe"><path d="M437 670 L437.0 744.0 Q437 768 461.0 768.0 L492 768" class="p-outer"/><path d="M437 670 L437.0 744.0 Q437 768 461.0 768.0 L492 768" class="p-body"/><path d="M437 670 L437.0 744.0 Q437 768 461.0 768.0 L492 768" class="p-shine"/><path d="M437 670 L437.0 744.0 Q437 768 461.0 768.0 L492 768" class="flow-in"/></g>
-<g class="pipe"><path d="M596 742 L596.0 587.0 Q596 563 572.0 563.0 L556 563" class="p-outer"/><path d="M596 742 L596.0 587.0 Q596 563 572.0 563.0 L556 563" class="p-body"/><path d="M596 742 L596.0 587.0 Q596 563 572.0 563.0 L556 563" class="p-shine"/><path d="M596 742 L596.0 587.0 Q596 563 572.0 563.0 L556 563" class="flow-ex"/></g>
-<g class="pipe"><path d="M556 218 L600.0 218.0 Q624 218 624.0 194.0 L624 146" class="p-outer"/><path d="M556 218 L600.0 218.0 Q624 218 624.0 194.0 L624 146" class="p-body"/><path d="M556 218 L600.0 218.0 Q624 218 624.0 194.0 L624 146" class="p-shine"/><path d="M556 218 L600.0 218.0 Q624 218 624.0 194.0 L624 146" class="flow-ex"/></g>
+<g class="pipe"><path d="M24 731 L84 731" class="p-outer"/><path d="M24 731 L84 731" class="p-body"/><path d="M24 731 L84 731" class="p-shine"/></g>
+<g class="pipe"><path d="M155 478 L155.0 242.0 Q155 218 179.0 218.0 L322 218" class="p-outer"/><path d="M155 478 L155.0 242.0 Q155 218 179.0 218.0 L322 218" class="p-body"/><path d="M155 478 L155.0 242.0 Q155 218 179.0 218.0 L322 218" class="p-shine"/></g>
+<g class="pipe"><path d="M437 670 L437.0 744.0 Q437 768 461.0 768.0 L492 768" class="p-outer"/><path d="M437 670 L437.0 744.0 Q437 768 461.0 768.0 L492 768" class="p-body"/><path d="M437 670 L437.0 744.0 Q437 768 461.0 768.0 L492 768" class="p-shine"/></g>
+<g class="pipe"><path d="M596 742 L596.0 587.0 Q596 563 572.0 563.0 L556 563" class="p-outer"/><path d="M596 742 L596.0 587.0 Q596 563 572.0 563.0 L556 563" class="p-body"/><path d="M596 742 L596.0 587.0 Q596 563 572.0 563.0 L556 563" class="p-shine"/></g>
+<g class="pipe"><path d="M556 218 L600.0 218.0 Q624 218 624.0 194.0 L624 146" class="p-outer"/><path d="M556 218 L600.0 218.0 Q624 218 624.0 194.0 L624 146" class="p-body"/><path d="M556 218 L600.0 218.0 Q624 218 624.0 194.0 L624 146" class="p-shine"/></g>
 <!-- flanges -->
 <g fill="#aab3b7" stroke="#7e888d" stroke-width="1.5">
   <rect x="318" y="202" width="10" height="32" rx="2"/><rect x="550" y="202" width="10" height="32" rx="2"/>
@@ -87,8 +87,8 @@
 <path d="M356 223 a81 81 0 1 0 162 0 a81 81 0 1 0 -162 0ZM356 558 a81 81 0 1 0 162 0 a81 81 0 1 0 -162 0ZM423 223 V558 H451 V223Z" fill="url(#chamberX)"/>
 <circle cx="437" cy="223" r="44" fill="url(#core)"/><ellipse cx="423" cy="207" rx="13" ry="8" fill="#fff" opacity=".55" transform="rotate(-30 423 207)"/><circle cx="437" cy="558" r="44" fill="url(#core)"/><ellipse cx="423" cy="542" rx="13" ry="8" fill="#fff" opacity=".55" transform="rotate(-30 423 542)"/>
 <!-- intake pipes pass through the outer (exhaust) chamber into the inner one -->
-<g class="pipe"><path d="M318 218 L360 218" class="p-outer"/><path d="M318 218 L360 218" class="p-body"/><path d="M318 218 L360 218" class="p-shine"/><path d="M318 218 L360 218" class="flow-in"/></g>
-<g class="pipe"><path d="M437 634 L437 684" class="p-outer"/><path d="M437 634 L437 684" class="p-body"/><path d="M437 634 L437 684" class="p-shine"/><path d="M437 634 L437 684" class="flow-in"/></g>
+<g class="pipe"><path d="M318 218 L360 218" class="p-outer"/><path d="M318 218 L360 218" class="p-body"/><path d="M318 218 L360 218" class="p-shine"/></g>
+<g class="pipe"><path d="M437 634 L437 684" class="p-outer"/><path d="M437 634 L437 684" class="p-body"/><path d="M437 634 L437 684" class="p-shine"/></g>
 
 <!-- ionizer -->
 <ellipse cx="155" cy="806" rx="80" ry="8" class="shadow"/>

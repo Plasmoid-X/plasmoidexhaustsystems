@@ -45,6 +45,56 @@
       inside: BLUE },
   ];
 
+  // Pipe runs, in the direction of flow (same routes and 24-unit bends as
+  // the drawing). Each is sampled into points with a normal for the swirl.
+  const PIPE_R = 6.5, PIPE_SPEED = 38, PIPE_SPIN = 5.5;
+  const PIPE_RUNS = [
+    { flow: 1, pts: [[24, 731], [84, 731]] },
+    { flow: 1, pts: [[155, 478], [155, 218], [358, 218]] },
+    { flow: 1, pts: [[437, 640], [437, 768], [492, 768]] },
+    { flow: 0, pts: [[596, 742], [596, 563], [556, 563]] },
+    { flow: 0, pts: [[556, 218], [624, 218], [624, 146]] },
+  ];
+  function samplePipe(pts, r = 24) {
+    const out = [];
+    const push = (x, y) => out.push({ x, y });
+    const toward = (a, b, d) => {
+      const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+      return [a[0] + dx / L * d, a[1] + dy / L * d];
+    };
+    const line = (a, b) => {
+      const n = Math.max(2, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2));
+      for (let i = 0; i < n; i++) push(a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n);
+    };
+    let start = pts[0];
+    for (let i = 1; i < pts.length - 1; i++) {
+      const p1 = toward(pts[i], pts[i - 1], r), p2 = toward(pts[i], pts[i + 1], r);
+      line(start, p1);
+      for (let j = 0; j < 16; j++) {
+        const u = j / 16, v = 1 - u;
+        push(v * v * p1[0] + 2 * v * u * pts[i][0] + u * u * p2[0], v * v * p1[1] + 2 * v * u * pts[i][1] + u * u * p2[1]);
+      }
+      start = p2;
+    }
+    line(start, pts[pts.length - 1]);
+    push(...pts[pts.length - 1]);
+    let len = 0;
+    out.forEach((p, i) => {
+      if (i) len += Math.hypot(p.x - out[i - 1].x, p.y - out[i - 1].y);
+      p.s = len;
+      const a = out[Math.max(0, i - 1)], b = out[Math.min(out.length - 1, i + 1)];
+      const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy) || 1;
+      p.nx = -dy / L; p.ny = dx / L;
+    });
+    return { points: out, length: len };
+  }
+  function pointAt(pipe, s) {
+    const pts = pipe.points;
+    let lo = 0, hi = pts.length - 1;
+    while (hi - lo > 1) { const m = (lo + hi) >> 1; if (pts[m].s <= s) lo = m; else hi = m; }
+    return pts[lo];
+  }
+
   function init(wrap) {
     const canvas = wrap.querySelector(".diagram-swirl");
     if (!canvas || !canvas.getContext) return;
@@ -56,6 +106,15 @@
       for (let i = 0; i < f.count; i++) {
         particles.push({ f, theta: Math.random() * Math.PI * 2,
           y: f.from + (f.to - f.from) * (i + Math.random()) / f.count });
+      }
+    });
+
+    const pipeParticles = [];
+    PIPE_RUNS.forEach((run) => {
+      const pipe = Object.assign(samplePipe(run.pts), { flow: FLOWS[run.flow] });
+      const n = Math.round(pipe.length / 16);
+      for (let i = 0; i < n; i++) {
+        pipeParticles.push({ pipe, s: pipe.length * (i + Math.random()) / n, theta: Math.random() * Math.PI * 2 });
       }
     });
 
@@ -99,16 +158,56 @@
         ctx.restore();
       }
 
-      // In the neck the exhaust spirals around the intake tube: its near
-      // half passes in front of the blue passage, so draw that half last.
+      // The exhaust passage surrounds the intake passage, so the near half of
+      // the exhaust swirl passes in front of the blue (spheres and neck).
+      // Drawn last, but kept off the intake pipes that cross the chamber.
       ctx.save();
       ctx.beginPath();
-      ctx.rect(TOP.x - ORANGE[1], TOP.y + BLUE[0] + 4, ORANGE[1] * 2, BOT.y - TOP.y - BLUE[0] * 2 - 8);
+      body(ctx, ...ORANGE);
+      reverseRect(316, 205, 46, 26);
+      reverseRect(424, 632, 26, 54);
       ctx.clip();
       for (const pt of particles) {
         if (pt.f === FLOWS[0]) drawStreak(pt, (p) => p.depth > 0);
       }
       ctx.restore();
+
+      // Gas in the pipes, swirling along them like in the Vajra.
+      for (const pp of pipeParticles) drawPipeStreak(pp);
+    }
+
+    // A rectangle wound the other way, to cut a hole in a clip path.
+    function reverseRect(x, y, w, h) {
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y + h);
+      ctx.lineTo(x + w, y + h);
+      ctx.lineTo(x + w, y);
+      ctx.closePath();
+    }
+
+    function drawPipeStreak(pp) {
+      const pipe = pp.pipe, f = pipe.flow;
+      const SEGS = 14, ARC = 1.8;
+      let prev = null;
+      for (let k = SEGS; k >= 0; k--) {
+        const back = ARC * (k / SEGS);
+        const t = pp.theta - back;
+        const s = pp.s - back * PIPE_SPEED / PIPE_SPIN;
+        if (s < 0) { prev = null; continue; }
+        const at = pointAt(pipe, s);
+        const p = { x: at.x + at.nx * PIPE_R * Math.cos(t), y: at.y + at.ny * PIPE_R * Math.cos(t), depth: Math.sin(t) };
+        if (prev) {
+          const near = (p.depth + 1) / 2;
+          const a = (f.back + (f.front - f.back) * near) * (1 - k / SEGS);
+          ctx.strokeStyle = `rgba(${f.rgb}, ${a.toFixed(3)})`;
+          ctx.lineWidth = 2.6 * (0.45 + 0.75 * near);
+          ctx.beginPath();
+          ctx.moveTo(prev.x, prev.y);
+          ctx.lineTo(p.x, p.y);
+          ctx.stroke();
+        }
+        prev = p;
+      }
     }
 
     function drawStreak(pt, only) {
@@ -147,6 +246,11 @@
           pt.y = f.from;
           pt.theta = Math.random() * Math.PI * 2;
         }
+      }
+      for (const pp of pipeParticles) {
+        pp.theta += PIPE_SPIN * dt;
+        pp.s += PIPE_SPEED * dt;
+        if (pp.s > pp.pipe.length) pp.s -= pp.pipe.length;
       }
     }
 
