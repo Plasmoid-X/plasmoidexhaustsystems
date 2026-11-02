@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 905" width="700" height="905" role="img" aria-labelledby="t">
+<title id="t">Plasmoid X system diagram</title>
+<style>
+  text { font-family: Inter, "Helvetica Neue", Arial, sans-serif; fill: #2b3a35; }
+  .legend text { font-size: 15px; }
+  .label { font-size: 15px; text-anchor: middle; }
+  .badge circle { fill: #123524; }
+  .badge text { fill: #fff; font-size: 17px; font-weight: 700; text-anchor: middle; }
+  .shadow { fill: #0b1a15; opacity: .07; }
+  .p-outer { fill: none; stroke: #8d979c; stroke-width: 24; stroke-linecap: butt; }
+  .p-body { fill: none; stroke: url(#pipeBody); stroke: #d5dbde; stroke-width: 19; }
+  .p-shine { fill: none; stroke: #f7f9fa; stroke-width: 5; opacity: .85; transform: translate(-3px,-3px); }
+  .flow-in, .flow-ex { fill: none; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 11 9; }
+  .flow-in { stroke: #1b6a8f; }
+  .flow-ex { stroke: #c4511b; }
+  .bubble { fill: rgba(255,255,255,.75); stroke: rgba(255,255,255,.95); stroke-width: 1; }
+  .uv-glow { opacity: .85; }
+  @media (prefers-reduced-motion: no-preference) {
+    .flow-in, .flow-ex { animation: flow 1.1s linear infinite; }
+    .bubble { animation: rise var(--d) ease-in infinite; animation-delay: var(--dl); }
+    .uv-glow { animation: uv 2.8s ease-in-out infinite; }
+    .uv-beam { animation: uv 2.8s ease-in-out infinite; }
+    .fan { animation: spin 0.9s linear infinite; }
+  }
+  @keyframes flow { to { stroke-dashoffset: -20; } }
+  @keyframes rise {
+    0% { transform: translate(0,0); opacity: 0; }
+    10% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { transform: translate(var(--dx),-112px); opacity: 0; }
+  }
+  @keyframes uv { 0%,100% { opacity: .7; } 50% { opacity: 1; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+<defs>
+  <radialGradient id="steel" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#f4f6f7"/><stop offset=".6" stop-color="#c3cbcf"/><stop offset="1" stop-color="#8e989d"/></radialGradient>
+  <radialGradient id="shell" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#f7b072"/><stop offset=".7" stop-color="#e8873b"/><stop offset="1" stop-color="#c96a24"/></radialGradient>
+  <radialGradient id="chamber" cx="42%" cy="38%" r="70%"><stop offset="0" stop-color="#e6f6fd"/><stop offset=".65" stop-color="#9fd6f1"/><stop offset="1" stop-color="#5fb4e0"/></radialGradient>
+  <linearGradient id="steelX" x1="0" x2="1"><stop offset="0" stop-color="#9aa3a8"/><stop offset=".35" stop-color="#e9edef"/><stop offset=".7" stop-color="#c3cbcf"/><stop offset="1" stop-color="#8e989d"/></linearGradient>
+  <linearGradient id="shellX" x1="0" x2="1"><stop offset="0" stop-color="#cf6f27"/><stop offset=".35" stop-color="#f6a965"/><stop offset=".7" stop-color="#e8873b"/><stop offset="1" stop-color="#c96a24"/></linearGradient>
+  <linearGradient id="chamberX" x1="0" x2="1"><stop offset="0" stop-color="#6dbbe4"/><stop offset=".38" stop-color="#e3f5fd"/><stop offset=".72" stop-color="#a6d9f2"/><stop offset="1" stop-color="#62b5e0"/></linearGradient>
+  <radialGradient id="core" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#c9cfd3"/><stop offset="1" stop-color="#6f797f"/></radialGradient>
+  <linearGradient id="glass" x1="0" x2="1"><stop offset="0" stop-color="#e3eaee"/><stop offset=".18" stop-color="#ffffff"/><stop offset=".85" stop-color="#eef3f6"/><stop offset="1" stop-color="#d4dde2"/></linearGradient>
+  <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd0ef"/><stop offset="1" stop-color="#3f9dcc"/></linearGradient>
+  <linearGradient id="capH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef1f3"/><stop offset=".5" stop-color="#b9c1c6"/><stop offset="1" stop-color="#8a9499"/></linearGradient>
+  <linearGradient id="tubeSteel" x1="0" x2="1"><stop offset="0" stop-color="#8e989d"/><stop offset=".3" stop-color="#e7ebed"/><stop offset="1" stop-color="#9aa3a8"/></linearGradient>
+  <linearGradient id="tubeShell" x1="0" x2="1"><stop offset="0" stop-color="#c96a24"/><stop offset=".35" stop-color="#f3a35f"/><stop offset="1" stop-color="#d4762d"/></linearGradient>
+  <linearGradient id="tubeCore" x1="0" x2="1"><stop offset="0" stop-color="#7cc3e8"/><stop offset=".4" stop-color="#e6f6fd"/><stop offset="1" stop-color="#7cc3e8"/></linearGradient>
+  <linearGradient id="uvBeam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a855f7" stop-opacity=".55"/><stop offset="1" stop-color="#a855f7" stop-opacity="0"/></linearGradient>
+  <linearGradient id="block" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7d878c"/><stop offset="1" stop-color="#4c565b"/></linearGradient>
+  <linearGradient id="head" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6d73"/><stop offset="1" stop-color="#1d4c51"/></linearGradient>
+  <radialGradient id="compressor" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#eef2f4"/><stop offset="1" stop-color="#9aa4a9"/></radialGradient>
+  <radialGradient id="turbine" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#b7a79a"/><stop offset=".6" stop-color="#7a6253"/><stop offset="1" stop-color="#4b3b31"/></radialGradient>
+  <filter id="glow" x="-50%" y="-200%" width="200%" height="500%"><feGaussianBlur stdDeviation="7"/></filter>
+  <clipPath id="waterClip"><rect x="88" y="654" width="134" height="118"/></clipPath>
+</defs>
+
+<!-- legend -->
+<g class="legend">
+  <line x1="70" y1="28" x2="112" y2="28" stroke="#1b6a8f" stroke-width="5" stroke-linecap="round"/><text x="124" y="33">Intake air / plasmoids</text>
+  <line x1="70" y1="60" x2="112" y2="60" stroke="#c4511b" stroke-width="5" stroke-linecap="round"/><text x="124" y="65">Exhaust gas</text>
+  <circle cx="91" cy="93" r="10" fill="url(#core)"/><text x="124" y="98">Sealed stainless core</text>
+</g>
+
+<ellipse cx="437" cy="700" rx="100" ry="8" class="shadow"/>
+<!-- pipes (drawn first so fittings sit on top) -->
+<g class="pipe"><path d="M24 731 L84 731" class="p-outer"/><path d="M24 731 L84 731" class="p-body"/><path d="M24 731 L84 731" class="p-shine"/></g>
+<g class="pipe"><path d="M155 478 L155.0 242.0 Q155 218 179.0 218.0 L322 218" class="p-outer"/><path d="M155 478 L155.0 242.0 Q155 218 179.0 218.0 L322 218" class="p-body"/><path d="M155 478 L155.0 242.0 Q155 218 179.0 218.0 L322 218" class="p-shine"/></g>
+<g class="pipe"><path d="M437 670 L437.0 744.0 Q437 768 461.0 768.0 L492 768" class="p-outer"/><path d="M437 670 L437.0 744.0 Q437 768 461.0 768.0 L492 768" class="p-body"/><path d="M437 670 L437.0 744.0 Q437 768 461.0 768.0 L492 768" class="p-shine"/></g>
+<g class="pipe"><path d="M596 742 L596.0 587.0 Q596 563 572.0 563.0 L556 563" class="p-outer"/><path d="M596 742 L596.0 587.0 Q596 563 572.0 563.0 L556 563" class="p-body"/><path d="M596 742 L596.0 587.0 Q596 563 572.0 563.0 L556 563" class="p-shine"/></g>
+<g class="pipe"><path d="M556 218 L600.0 218.0 Q624 218 624.0 194.0 L624 146" class="p-outer"/><path d="M556 218 L600.0 218.0 Q624 218 624.0 194.0 L624 146" class="p-body"/><path d="M556 218 L600.0 218.0 Q624 218 624.0 194.0 L624 146" class="p-shine"/></g>
+<!-- flanges -->
+<g fill="#aab3b7" stroke="#7e888d" stroke-width="1.5">
+  <rect x="318" y="202" width="10" height="32" rx="2"/><rect x="550" y="202" width="10" height="32" rx="2"/>
+  <rect x="550" y="547" width="10" height="32" rx="2"/><rect x="421" y="660" width="32" height="10" rx="2"/>
+  <rect x="139" y="472" width="32" height="10" rx="2"/>
+</g>
+<!-- inlet / outlet stubs into spheres -->
+<!-- exhaust out funnel -->
+<path d="M604 146 L644 146 L656 126 L592 126 Z" fill="url(#capH)" stroke="#7e888d" stroke-width="1.5"/>
+
+<!-- the vessel in cross-section: each layer is one continuous shape
+     (two spheres joined by the neck), so the passages run through -->
+<path d="M319 223 a118 118 0 1 0 236 0 a118 118 0 1 0 -236 0ZM319 558 a118 118 0 1 0 236 0 a118 118 0 1 0 -236 0ZM397 223 V558 H477 V223Z" fill="url(#steelX)"/>
+<path d="M323 223 a114 114 0 1 0 228 0 a114 114 0 1 0 -228 0ZM323 558 a114 114 0 1 0 228 0 a114 114 0 1 0 -228 0ZM401 223 V558 H473 V223Z" fill="url(#shellX)"/>
+<path d="M351 223 a86 86 0 1 0 172 0 a86 86 0 1 0 -172 0ZM351 558 a86 86 0 1 0 172 0 a86 86 0 1 0 -172 0ZM419 223 V558 H455 V223Z" fill="#eef3f5"/>
+<path d="M356 223 a81 81 0 1 0 162 0 a81 81 0 1 0 -162 0ZM356 558 a81 81 0 1 0 162 0 a81 81 0 1 0 -162 0ZM423 223 V558 H451 V223Z" fill="url(#chamberX)"/>
+<circle cx="437" cy="223" r="44" fill="url(#core)"/><ellipse cx="423" cy="207" rx="13" ry="8" fill="#fff" opacity=".55" transform="rotate(-30 423 207)"/><circle cx="437" cy="558" r="44" fill="url(#core)"/><ellipse cx="423" cy="542" rx="13" ry="8" fill="#fff" opacity=".55" transform="rotate(-30 423 542)"/>
+<!-- intake pipes pass through the outer (exhaust) chamber into the inner one -->
+<g class="pipe"><path d="M318 218 L360 218" class="p-outer"/><path d="M318 218 L360 218" class="p-body"/><path d="M318 218 L360 218" class="p-shine"/></g>
+<g class="pipe"><path d="M437 634 L437 684" class="p-outer"/><path d="M437 634 L437 684" class="p-body"/><path d="M437 634 L437 684" class="p-shine"/></g>
+
+<!-- ionizer -->
+<ellipse cx="155" cy="806" rx="80" ry="8" class="shadow"/>
+<rect x="84" y="488" width="142" height="290" fill="url(#glass)" stroke="#c5ced3" stroke-width="2"/>
+<g clip-path="url(#waterClip)">
+  <rect x="86" y="654" width="138" height="122" fill="url(#water)"/>
+  <ellipse cx="155" cy="655" rx="69" ry="5" fill="#c9ecfa" opacity=".9"/>
+  <circle class="bubble" cx="134.9" cy="766" r="3.8" style="--d:3.57s;--dl:-0.29s;--dx:0.6px"/><circle class="bubble" cx="139.7" cy="766" r="3.3" style="--d:3.31s;--dl:-0.15s;--dx:-1.1px"/><circle class="bubble" cx="106.0" cy="766" r="3.5" style="--d:3.16s;--dl:-3.31s;--dx:-6.0px"/><circle class="bubble" cx="123.4" cy="766" r="6.1" style="--d:4.11s;--dl:-2.31s;--dx:-1.7px"/><circle class="bubble" cx="209.3" cy="766" r="3.2" style="--d:3.95s;--dl:-1.16s;--dx:-5.7px"/><circle class="bubble" cx="111.4" cy="766" r="4.5" style="--d:3.87s;--dl:-0.72s;--dx:1.3px"/><circle class="bubble" cx="170.8" cy="766" r="4.9" style="--d:3.39s;--dl:-0.25s;--dx:-7.0px"/><circle class="bubble" cx="121.5" cy="766" r="6.4" style="--d:3.17s;--dl:-1.26s;--dx:1.4px"/><circle class="bubble" cx="149.7" cy="766" r="4.5" style="--d:3.83s;--dl:-2.80s;--dx:-4.1px"/><circle class="bubble" cx="163.5" cy="766" r="5.6" style="--d:3.98s;--dl:-2.92s;--dx:-3.4px"/><circle class="bubble" cx="209.7" cy="766" r="3.6" style="--d:3.15s;--dl:-3.03s;--dx:-5.6px"/><circle class="bubble" cx="153.7" cy="766" r="3.2" style="--d:3.60s;--dl:-3.06s;--dx:1.2px"/><circle class="bubble" cx="197.8" cy="766" r="4.6" style="--d:3.65s;--dl:-2.38s;--dx:1.3px"/><circle class="bubble" cx="150.0" cy="766" r="7.2" style="--d:4.10s;--dl:-1.90s;--dx:2.6px"/><circle class="bubble" cx="104.9" cy="766" r="6.5" style="--d:3.56s;--dl:-3.97s;--dx:5.2px"/><circle class="bubble" cx="130.4" cy="766" r="4.9" style="--d:3.60s;--dl:-0.09s;--dx:-0.6px"/>
+</g>
+<path d="M96 731 L104 731 L104 764" fill="none" stroke="#9aa4a9" stroke-width="5" stroke-linecap="round"/>
+<rect x="100" y="760" width="110" height="6" rx="3" fill="#8d979c"/>
+<!-- UV lamp -->
+<polygon class="uv-beam" points="112,552 198,552 222,650 88,650" fill="url(#uvBeam)"/>
+<rect class="uv-glow" x="104" y="532" width="102" height="22" rx="11" fill="#c084fc" filter="url(#glow)"/>
+<rect x="112" y="536" width="86" height="14" rx="7" fill="#f3e8ff" stroke="#a855f7" stroke-width="2"/>
+<text x="155" y="520" class="label" style="font-weight:700;fill:#4c3a8f;font-size:14px;letter-spacing:.06em">UV LIGHT</text>
+<text x="155" y="640" class="label" style="font-weight:700;fill:#1d4c51;font-size:14px;letter-spacing:.06em">WATER</text>
+<rect x="76" y="476" width="158" height="16" rx="4" fill="url(#capH)"/>
+<rect x="76" y="774" width="158" height="16" rx="4" fill="url(#capH)"/>
+
+<!-- turbo + engine -->
+<ellipse cx="604" cy="879" rx="100" ry="5" class="shadow"/>
+<!-- engine: valve cover, cylinder head, ribbed block, sump, pulley -->
+<g>
+  <rect x="520" y="812" width="168" height="14" rx="7" fill="url(#head)"/>
+  <g stroke="#5fa4a9" stroke-width="2"><line x1="536" y1="815" x2="536" y2="823"/><line x1="552" y1="815" x2="552" y2="823"/><line x1="568" y1="815" x2="568" y2="823"/><line x1="584" y1="815" x2="584" y2="823"/><line x1="600" y1="815" x2="600" y2="823"/><line x1="616" y1="815" x2="616" y2="823"/><line x1="632" y1="815" x2="632" y2="823"/><line x1="648" y1="815" x2="648" y2="823"/><line x1="664" y1="815" x2="664" y2="823"/></g>
+  <rect x="512" y="825" width="184" height="12" rx="3" fill="#8b959a"/>
+  <rect x="518" y="836" width="172" height="30" rx="4" fill="url(#block)"/>
+  <g stroke="#3d464b" stroke-width="2"><line x1="532" y1="840" x2="532" y2="862"/><line x1="552" y1="840" x2="552" y2="862"/><line x1="572" y1="840" x2="572" y2="862"/><line x1="592" y1="840" x2="592" y2="862"/><line x1="612" y1="840" x2="612" y2="862"/><line x1="632" y1="840" x2="632" y2="862"/><line x1="652" y1="840" x2="652" y2="862"/><line x1="672" y1="840" x2="672" y2="862"/></g>
+  <rect x="532" y="864" width="146" height="8" rx="3" fill="#3d464b"/>
+  <circle cx="684" cy="850" r="11" fill="#5c666b" stroke="#3d464b" stroke-width="2"/><circle cx="684" cy="850" r="3" fill="#2a3135"/>
+</g>
+<!-- exhaust manifold: head to turbine; compressor outlet to engine intake -->
+<path d="M596 790 L596 826" stroke="#7a6253" stroke-width="16" fill="none"/>
+<path d="M518 792 L518 826" stroke="#9aa4a9" stroke-width="16" fill="none"/>
+<!-- turbocharger: compressor (intake side) and turbine (exhaust side) on one shaft -->
+<g>
+  <rect x="540" y="759" width="34" height="18" rx="4" fill="#a7b0b5" stroke="#7e888d" stroke-width="1.5"/>
+  <line x1="544" y1="768" x2="570" y2="768" stroke="#6f797f" stroke-width="3"/>
+  <!-- compressor housing (cold side): volute spiral, inlet eye, wheel -->
+  <circle cx="518" cy="768" r="27" fill="url(#compressor)" stroke="#7e888d" stroke-width="2"/>
+  <path d="M518 745 A23 23 0 1 1 495 768" fill="none" stroke="#a9b2b7" stroke-width="3"/>
+  <circle cx="518" cy="768" r="13" fill="#e3e8ea" stroke="#7e888d" stroke-width="1.5"/>
+  <g class="fan" style="transform-origin:518px 768px"><path d="M518 757 L520.5 768 L518 779 L515.5 768 Z M507 768 L518 765.5 L529 768 L518 770.5 Z" fill="#6f797f"/></g>
+  <!-- turbine housing (hot side) -->
+  <circle cx="596" cy="768" r="25" fill="url(#turbine)" stroke="#4b3b31" stroke-width="2"/>
+  <path d="M596 747 A21 21 0 1 1 575 768" fill="none" stroke="#9c8473" stroke-width="3"/>
+  <circle cx="596" cy="768" r="9" fill="#5b483d" stroke="#3a2e27" stroke-width="1.5"/>
+</g>
+<!-- labels and step badges -->
+<text x="56" y="707" class="label">Air in</text>
+<text x="155" y="822" class="label">Ionizer</text>
+<text x="624" y="112" class="label">Exhaust out</text>
+<text x="604" y="898" class="label">Turbo and engine</text>
+<g class="badge"><circle cx="52" cy="672" r="17"/><text x="52" y="678">1</text></g><g class="badge"><circle cx="262" cy="632" r="17"/><text x="262" y="638">2</text></g><g class="badge"><circle cx="292" cy="145" r="17"/><text x="292" y="151">3</text></g><g class="badge"><circle cx="520" cy="392" r="17"/><text x="520" y="398">4</text></g><g class="badge"><circle cx="470" cy="812" r="17"/><text x="470" y="818">5</text></g><g class="badge"><circle cx="572" cy="160" r="17"/><text x="572" y="166">6</text></g>
+</svg>
