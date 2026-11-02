@@ -37,17 +37,17 @@
 
   const FLOWS = [
     // exhaust first, so the divider can be cleared before the intake is drawn
-    { radius: exhaustR, from: 662, to: 130, drift: -11, spin: -1.2, count: 110,
+    { radius: exhaustR, from: 662, to: 130, drift: -22, spin: -2.4, count: 110,
       rgb: "196, 18, 24", front: 0.95, back: 0.4, width: 4.4,
       inside: ORANGE, outside: DIVIDER },
-    { radius: intakeR, from: 150, to: 632, drift: 13, spin: 1.5, count: 34,
+    { radius: intakeR, from: 150, to: 632, drift: 26, spin: 3, count: 34,
       rgb: "14, 92, 186", front: 0.95, back: 0.3, width: 3,
       inside: BLUE },
   ];
 
   // Pipe runs, in the direction of flow (same routes and 24-unit bends as
   // the drawing). Each is sampled into points with a normal for the swirl.
-  const PIPE_R = 6.5, PIPE_SPEED = 38, PIPE_SPIN = 5.5;
+  const PIPE_R = 6.5, PIPE_SPEED = 75, PIPE_SPIN = 11;
   const PIPE_RUNS = [
     { flow: 1, pts: [[24, 731], [84, 731]] },
     { flow: 1, pts: [[155, 478], [155, 218], [358, 218]] },
