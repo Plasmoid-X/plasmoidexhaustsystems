@@ -95,9 +95,20 @@
         }
         ctx.restore();
       }
+
+      // In the neck the exhaust spirals around the intake tube: its near
+      // half passes in front of the blue passage, so draw that half last.
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(TOP.x - ORANGE[1], TOP.y + BLUE[0], ORANGE[1] * 2, BOT.y - TOP.y - BLUE[0] * 2);
+      ctx.clip();
+      for (const pt of particles) {
+        if (pt.f === FLOWS[0]) drawStreak(pt, (p) => p.depth > 0);
+      }
+      ctx.restore();
     }
 
-    function drawStreak(pt) {
+    function drawStreak(pt, only) {
       const SEGS = 22, ARC = 1.7;  // trail length in radians
       {
         const f = pt.f;
@@ -108,7 +119,7 @@
           const r = f.radius(y);
           if (r < 2) { prev = null; continue; }
           const p = project(t, y, r);
-          if (prev && !hiddenByCore(p) && !hiddenByCore(prev)) {
+          if (prev && !hiddenByCore(p) && !hiddenByCore(prev) && (!only || (only(p) && only(prev)))) {
             const near = (p.depth + 1) / 2;                      // 0 far .. 1 near
             const fade = 1 - k / SEGS;                           // head bright, tail fades
             const a = (f.back + (f.front - f.back) * near) * fade;
