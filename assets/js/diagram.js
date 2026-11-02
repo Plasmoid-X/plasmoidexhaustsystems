@@ -9,42 +9,40 @@
   const TOP = { x: 437, y: 223 }, BOT = { x: 437, y: 558 };
   const CORE_R = 44;          // sealed stainless core
   const TILT = 0.3;           // how far we look down on the vortex
-  const TUBE = { y0: 296, y1: 488 };
 
   // Radius of each vortex at height y.
   const sphereR = (y, c, r) => {
     const h = y - c.y;
     return Math.abs(h) < r ? Math.sqrt(r * r - h * h) : 0;
   };
-  const inTube = (y) => y > TUBE.y0 && y < TUBE.y1;
+  const inTube = (y) => y > TOP.y && y < BOT.y;
+
+  // The vessel is a cross-section: each passage is one shape made of both
+  // spheres joined by the neck. These match the drawing's layers.
+  function body(ctx, r, half) {
+    for (const c of [TOP, BOT]) {
+      ctx.moveTo(c.x + r, c.y);
+      ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+    }
+    ctx.rect(TOP.x - half, TOP.y, half * 2, BOT.y - TOP.y);
+  }
+  const ORANGE = [104, 33];   // exhaust passage (outer)
+  const DIVIDER = [86, 18];   // wall between the passages
+  const BLUE = [80, 14];      // intake passage (inner)
+
   const intakeR = (y) => Math.max(
-    0.8 * sphereR(y, TOP, 79), 0.8 * sphereR(y, BOT, 79), inTube(y) ? 11 : 0);
+    0.8 * sphereR(y, TOP, 79), 0.8 * sphereR(y, BOT, 79), inTube(y) ? 10 : 0);
   const exhaustR = (y) => Math.max(
-    sphereR(y, TOP, 96), sphereR(y, BOT, 96), inTube(y) ? 23.5 : 0);
+    sphereR(y, TOP, 95), sphereR(y, BOT, 95), inTube(y) ? 25.5 : 0);
 
   const FLOWS = [
-    { radius: intakeR, from: 150, to: 632, drift: 13, spin: 1.5, count: 34,
-      rgb: "14, 92, 186", front: 0.95, back: 0.3, width: 3,
-      // stays in the blue chamber of each sphere and the tube's blue core
-      clip: (ctx) => {
-        ctx.arc(TOP.x, TOP.y, 79, 0, Math.PI * 2);
-        ctx.moveTo(BOT.x + 79, BOT.y);
-        ctx.arc(BOT.x, BOT.y, 79, 0, Math.PI * 2);
-        ctx.rect(423, 290, 28, 204);
-      } },
+    // exhaust first, so the divider can be cleared before the intake is drawn
     { radius: exhaustR, from: 662, to: 130, drift: -11, spin: -1.2, count: 110,
       rgb: "196, 18, 24", front: 0.95, back: 0.4, width: 4.4,
-      // stays in the orange shell of each sphere and the tube's orange sides
-      clip: (ctx) => {
-        for (const c of [TOP, BOT]) {
-          ctx.moveTo(c.x + 104, c.y);
-          ctx.arc(c.x, c.y, 104, 0, Math.PI * 2, false);
-          ctx.moveTo(c.x + 87, c.y);
-          ctx.arc(c.x, c.y, 87, 0, Math.PI * 2, true);
-        }
-        ctx.rect(404, 296, 19, 196);
-        ctx.rect(451, 296, 19, 196);
-      } },
+      inside: ORANGE, outside: DIVIDER },
+    { radius: intakeR, from: 150, to: 632, drift: 13, spin: 1.5, count: 34,
+      rgb: "14, 92, 186", front: 0.95, back: 0.3, width: 3,
+      inside: BLUE },
   ];
 
   function init(wrap) {
@@ -83,10 +81,17 @@
       for (const f of FLOWS) {
         ctx.save();
         ctx.beginPath();
-        f.clip(ctx);
+        body(ctx, ...f.inside);
         ctx.clip();
         for (const pt of particles) {
           if (pt.f === f) drawStreak(pt);
+        }
+        if (f.outside) {
+          // keep the exhaust out of the divider and the intake passage
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.beginPath();
+          body(ctx, ...f.outside);
+          ctx.fill();
         }
         ctx.restore();
       }
