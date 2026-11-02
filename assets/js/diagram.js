@@ -1,11 +1,11 @@
 // Animated system diagram: two vortices drawn in 3D on a canvas over the
-// diagram image (coordinates are the image's own 700 x 847 pixels).
+// diagram (coordinates are the drawing's own 700 x 905 units).
 // Intake air swirls clockwise and drifts down; exhaust swirls the other way
 // in the outer shell and drifts up. Each streak runs round a tilted circle,
 // so the near side is bright and thick, the far side faint and hidden behind
 // the stainless core.
 (function () {
-  const W = 700, H = 847;
+  const W = 700, H = 905;
   const TOP = { x: 437, y: 223 }, BOT = { x: 437, y: 558 };
   const CORE_R = 44;          // sealed stainless core
   const TILT = 0.3;           // how far we look down on the vortex
@@ -20,7 +20,7 @@
   const intakeR = (y) => Math.max(
     0.8 * sphereR(y, TOP, 79), 0.8 * sphereR(y, BOT, 79), inTube(y) ? 11 : 0);
   const exhaustR = (y) => Math.max(
-    sphereR(y, TOP, 96), sphereR(y, BOT, 96), inTube(y) ? 25.5 : 0);
+    sphereR(y, TOP, 96), sphereR(y, BOT, 96), inTube(y) ? 23.5 : 0);
 
   const FLOWS = [
     { radius: intakeR, from: 150, to: 632, drift: 13, spin: 1.5, count: 34,
@@ -30,10 +30,10 @@
         ctx.arc(TOP.x, TOP.y, 79, 0, Math.PI * 2);
         ctx.moveTo(BOT.x + 79, BOT.y);
         ctx.arc(BOT.x, BOT.y, 79, 0, Math.PI * 2);
-        ctx.rect(424, 290, 27, 200);
+        ctx.rect(423, 290, 28, 204);
       } },
-    { radius: exhaustR, from: 662, to: 130, drift: -11, spin: -1.2, count: 64,
-      rgb: "196, 18, 24", front: 0.95, back: 0.35, width: 3,
+    { radius: exhaustR, from: 662, to: 130, drift: -11, spin: -1.2, count: 110,
+      rgb: "196, 18, 24", front: 0.95, back: 0.4, width: 4.4,
       // stays in the orange shell of each sphere and the tube's orange sides
       clip: (ctx) => {
         for (const c of [TOP, BOT]) {
@@ -42,8 +42,8 @@
           ctx.moveTo(c.x + 87, c.y);
           ctx.arc(c.x, c.y, 87, 0, Math.PI * 2, true);
         }
-        ctx.rect(405, 300, 12, 180);
-        ctx.rect(457, 300, 11, 180);
+        ctx.rect(404, 296, 19, 196);
+        ctx.rect(451, 296, 19, 196);
       } },
   ];
 
