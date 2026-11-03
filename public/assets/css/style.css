@@ -629,17 +629,6 @@ section { padding: 5.5rem 0; }
 .hero .btn-outline { background: rgba(18, 53, 36, 0.55); }
 .hero .btn-outline:hover { background: rgba(18, 53, 36, 0.8); }
 
-.status-strip { background: var(--dark-green); color: var(--white); }
-.status-list {
-  list-style: none; margin: 0 auto; padding: 1.4rem 0;
-  display: grid; grid-template-columns: repeat(2, auto); justify-content: start; gap: 1.5rem 3rem;
-}
-.status-list li { font-size: 0.9rem; color: rgba(255,255,255,0.78); line-height: 1.45; }
-.status-list strong {
-  display: block; color: var(--white);
-  font-family: "Plus Jakarta Sans", sans-serif; font-size: 1rem; font-weight: 700;
-}
-.status-list li + li { border-left: 1px solid rgba(255,255,255,0.18); padding-left: 1.5rem; }
 
 .problem { padding: 6.5rem 0 5rem; }
 .problem-grid { display: grid; grid-template-columns: 5fr 7fr; gap: 3.5rem; align-items: start; }
@@ -687,8 +676,6 @@ section { padding: 5.5rem 0; }
   .founder-band .founder { grid-template-columns: 1fr; gap: 1.75rem; }
 }
 @media (max-width: 720px) {
-  .status-list { grid-template-columns: 1fr; gap: 0.9rem; padding: 1.25rem 0; }
-  .status-list li + li { border-left: 0; padding-left: 0; border-top: 1px solid rgba(255,255,255,0.18); padding-top: 0.9rem; }
   .problem, .system { padding: 4.5rem 0; }
   .founder-band { padding: 4.5rem 0; }
   .closing { padding-bottom: 4.5rem; }
