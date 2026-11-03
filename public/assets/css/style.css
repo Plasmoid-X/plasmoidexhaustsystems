@@ -441,7 +441,7 @@ section { padding: 5.5rem 0; }
 .photo-frame { margin: 0; border-radius: var(--radius); overflow: hidden; aspect-ratio: 4 / 3; }
 .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
 
-/* Placeholder blocks (for product photos not yet available) */
+/* Placeholder blocks (striped stand-in for a missing image) */
 .placeholder-media {
   background: repeating-linear-gradient(
     135deg,
