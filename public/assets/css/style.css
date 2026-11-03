@@ -632,7 +632,7 @@ section { padding: 5.5rem 0; }
 .status-strip { background: var(--dark-green); color: var(--white); }
 .status-list {
   list-style: none; margin: 0 auto; padding: 1.4rem 0;
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+  display: grid; grid-template-columns: repeat(2, auto); justify-content: start; gap: 1.5rem 3rem;
 }
 .status-list li { font-size: 0.9rem; color: rgba(255,255,255,0.78); line-height: 1.45; }
 .status-list strong {
