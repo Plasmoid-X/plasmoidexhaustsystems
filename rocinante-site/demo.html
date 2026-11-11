@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rocinante Demo | Guided Tours</title>
+<meta name="description" content="Click through Rocinante on a fictional yacht: guided tours for engineers, the captain, crew on their phones, stores and the assistant." />
+<link rel="icon" href="/favicon.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="shell nav">
+    <a href="/" class="brand"><img src="/assets/logo.svg" alt="" width="34" height="34"> Rocinante <small>by Plasmoid X</small></a>
+    <nav aria-label="Main">
+      <ul class="nav-links">
+        <li><a href="/#features">Features</a></li>
+        <li><a href="/#on-board">On Board</a></li>
+        <li><a href="/#enquire" class="btn btn-primary">Enquire</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="shell demo-layout">
+  <aside class="tour-picker">
+    <h2>Guided Tours</h2>
+    <ol id="tour-picker"></ol>
+    <p class="demo-disclaimer">M/Y Example is a fictional yacht. Every name, figure and document in these screens is invented. Click the highlighted spot, or use Next or the arrow keys.</p>
+  </aside>
+
+  <div class="stage-wrap">
+    <div class="stage" id="stage">
+      <img id="stage-img" alt="" />
+    </div>
+    <div class="caption" aria-live="polite">
+      <div>
+        <div class="count" id="step-count"></div>
+        <h3 id="step-title"></h3>
+        <p id="step-text"></p>
+      </div>
+      <div class="controls">
+        <button class="btn btn-ghost" id="prev" type="button">Back</button>
+        <button class="btn btn-primary" id="next" type="button">Next</button>
+      </div>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <span>&copy; <span id="year">2026</span> Plasmoid X Ltd. Rocinante is a Plasmoid X product.</span>
+    <span><a href="/#enquire">Enquire about Rocinante for your vessel</a></span>
+  </div>
+</footer>
+
+<script src="/assets/tours.js"></script>
+<script src="/assets/site.js"></script>
+</body>
+</html>

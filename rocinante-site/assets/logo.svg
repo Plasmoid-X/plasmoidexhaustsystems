@@ -1,0 +1,6 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Planned maintenance">
+  <rect width="512" height="512" rx="112" fill="#0f5c63"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffffff" stroke-width="26" opacity="0.55"/>
+  <path d="M256 70 286 226 442 256 286 286 256 442 226 286 70 256 226 226Z" fill="#ffffff"/>
+  <path d="M256 70 286 226 256 256 226 226Z" fill="#e8b04b"/>
+</svg>
