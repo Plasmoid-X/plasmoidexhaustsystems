@@ -1,5 +1,5 @@
 // Capture the Rocinante demo tours from the User Manual's demo vessel (M/Y Example, made-up data).
-// node capture-tours.js <tours.json> <out-dir> [tourId]
+// node capture-tours.js <tours.json> <out-dir> [tourId|all] [light|dark]
 // Writes <out-dir>/img/<shot>.webp and <out-dir>/tours.js (the tour data with image sizes and hotspot boxes).
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');
@@ -7,9 +7,10 @@ const sharp = require('/home/user/Rocinante/node_modules/sharp');
 const BASE = 'http://localhost:3120', PW = 'manual-demo-password-1';
 const VP = { computer: { width: 1280, height: 800, scale: 1.5 }, phone: { width: 390, height: 844, scale: 2, mobile: true } };
 
-const [specFile, outDir, only] = process.argv.slice(2);
+const [specFile, outDir, only, scheme = 'light'] = process.argv.slice(2);
+const imgDir = scheme === 'dark' ? path.join('img', 'dark') : 'img';
 const spec = JSON.parse(fs.readFileSync(specFile, 'utf8'));
-fs.mkdirSync(path.join(outDir, 'img'), { recursive: true });
+fs.mkdirSync(path.join(outDir, imgDir), { recursive: true });
 
 const locate = (page, t) => {
   if (t.role) return page.getByRole(t.role, { name: t.name, exact: !!t.exact }).first();
@@ -36,7 +37,7 @@ async function contextFor(browser, as, vpName, custom) {
   const key = `${as}|${vpName}|${size.width}x${size.height}`;
   if (contexts.has(key)) return contexts.get(key);
   const ctx = await browser.newContext({ viewport: size, deviceScaleFactor: v.scale, isMobile: !!v.mobile, hasTouch: !!v.mobile,
-    reducedMotion: 'reduce', locale: 'en-GB', colorScheme: 'light' });
+    reducedMotion: 'reduce', locale: 'en-GB', colorScheme: scheme });
   const page = await ctx.newPage();
   for (let i = 0; i < 2; i++) {
     await page.goto(BASE + '/login', { waitUntil: 'domcontentloaded', timeout: 120000 });
@@ -55,7 +56,7 @@ async function contextFor(browser, as, vpName, custom) {
   const browser = await chromium.launch();
   const result = { tours: [] };
   for (const tour of spec.tours) {
-    if (only && tour.id !== only) continue;
+    if (only && only !== 'all' && tour.id !== only) continue;
     const out = { ...tour, steps: [] };
     for (const s of tour.steps) {
       const vpName = tour.viewport || 'computer';
@@ -81,7 +82,7 @@ async function contextFor(browser, as, vpName, custom) {
         const meta = await sharp(png).metadata();
         let q = 80, buf = await sharp(png).webp({ quality: q, effort: 5 }).toBuffer();
         while (buf.length > 260000 && q > 50) { q -= 8; buf = await sharp(png).webp({ quality: q, effort: 5 }).toBuffer(); }
-        fs.writeFileSync(path.join(outDir, 'img', `${s.shot}.webp`), buf);
+        fs.writeFileSync(path.join(outDir, imgDir, `${s.shot}.webp`), buf);
         out.steps.push({ shot: s.shot, title: s.title, text: s.text, w: meta.width, h: meta.height, hotspot: hot });
         console.log(`✓ ${tour.id}/${s.shot} ${meta.width}x${meta.height} ${(buf.length / 1024).toFixed(0)} KB${hot ? ' +hotspot' : ''}`);
       } catch (e) {
@@ -91,6 +92,6 @@ async function contextFor(browser, as, vpName, custom) {
     }
     result.tours.push(out);
   }
-  fs.writeFileSync(path.join(outDir, only ? `tours-${only}.json` : 'tours.json'), JSON.stringify(result, null, 1));
+  fs.writeFileSync(path.join(outDir, `${only ? `tours-${only}` : 'tours'}${scheme === 'dark' ? '-dark' : ''}.json`), JSON.stringify(result, null, 1));
   await browser.close();
 })();

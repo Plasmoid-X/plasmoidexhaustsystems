@@ -28,6 +28,16 @@
     };
     let tour = tours.find((t) => t.id === location.hash.slice(1)) || tours[0];
     let i = 0;
+    // Light or dark screens: the visitor's last choice on this browser, light by default.
+    let scheme = "light";
+    try { if (localStorage.getItem("rocinante-demo-scheme") === "dark") scheme = "dark"; } catch {}
+    const src = (s) => `/img/${scheme === "dark" ? "dark/" : ""}${s.shot}.webp`;
+    const switches = document.querySelectorAll(".theme-switch button");
+    switches.forEach((b) => b.addEventListener("click", () => {
+      scheme = b.dataset.scheme;
+      try { localStorage.setItem("rocinante-demo-scheme", scheme); } catch {}
+      render(false);
+    }));
 
     tours.forEach((t) => {
       const li = document.createElement("li");
@@ -43,13 +53,14 @@
     });
 
     // Preload the current tour's pictures so stepping through is instant.
-    const preload = (t) => t.steps.forEach((s) => { const p = new Image(); p.src = `/img/${s.shot}.webp`; });
+    const preload = (t) => t.steps.forEach((s) => { const p = new Image(); p.src = src(s); });
 
     function render(focusStage) {
       const s = tour.steps[i];
       picker.querySelectorAll("button").forEach((b) => b.setAttribute("aria-current", String(b.dataset.id === tour.id)));
       stage.classList.toggle("is-phone", !!tour.phone);
-      img.src = `/img/${s.shot}.webp`;
+      img.src = src(s);
+      switches.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.scheme === scheme)));
       img.width = s.w; img.height = s.h;
       img.alt = `${s.title}: ${s.text}`;
       stage.querySelectorAll(".hotspot").forEach((h) => h.remove());

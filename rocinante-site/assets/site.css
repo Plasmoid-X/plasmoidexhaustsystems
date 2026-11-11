@@ -58,6 +58,7 @@ p { margin: 0 0 1em; }
 .nav-links { display: flex; align-items: center; gap: 1.6rem; list-style: none; margin: 0; padding: 0; }
 .nav-links a { color: var(--ink); text-decoration: none; font-weight: 500; font-size: 0.95rem; }
 .nav-links a:hover { color: var(--teal); }
+.nav-links a.btn-primary, .nav-links a.btn-primary:hover { color: #fff; }
 
 /* Buttons */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 46px; padding: 0.7rem 1.4rem; border-radius: 999px;
@@ -146,6 +147,10 @@ section { padding: 5rem 0; }
 .demo-disclaimer { font-size: 0.85rem; color: var(--muted); margin-top: 1.5rem; }
 
 .stage-wrap { display: grid; gap: 1.2rem; }
+.stage-bar { display: flex; justify-content: flex-end; margin-bottom: -0.4rem; }
+.theme-switch { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); }
+.theme-switch button { font: 600 0.88rem var(--sans); border: 0; background: none; color: var(--muted); padding: 0.4rem 1rem; min-height: 34px; border-radius: 999px; cursor: pointer; }
+.theme-switch button[aria-pressed="true"] { background: var(--ink); color: #fff; }
 .stage { position: relative; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--line); background: var(--card); }
 .stage.is-phone { width: min(100%, 390px); margin: 0 auto; border-radius: 30px; border: 8px solid #151c1e; background: #151c1e; }
 .stage img { width: 100%; height: auto; }

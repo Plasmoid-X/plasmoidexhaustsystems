@@ -1,4 +1,4 @@
-// Generated from the demo vessel captures. Every name and figure is invented.
+// Generated from the demo vessel captures (light in img/, dark in img/dark/). Every name and figure is invented.
 window.TOURS = [
  {
   "id": "engineer",
