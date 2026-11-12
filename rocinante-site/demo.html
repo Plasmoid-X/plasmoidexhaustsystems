@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Rocinante Demo | Guided Tours</title>
-<meta name="description" content="Click through Rocinante on a fictional yacht: guided tours for engineers, the captain, crew on their phones, stores and the assistant." />
+<title>Rocinante Demo | Try It as Your Department</title>
+<meta name="description" content="Click around Rocinante on a fictional yacht as the Captain, the Chief Officer, the Chief Engineer, the Bosun or the Chief Stewardess, on a computer or a phone." />
 <link rel="icon" href="/favicon.png" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/site.css" />
 </head>
-<body>
+<body class="demo-page">
 
 <a class="skip-link" href="#main">Skip to content</a>
 
@@ -29,36 +29,57 @@
   </div>
 </header>
 
-<main id="main" class="shell demo-layout">
-  <aside class="tour-picker">
-    <h2>Guided Tours</h2>
-    <ol id="tour-picker"></ol>
-    <p class="demo-disclaimer">M/Y Example is a fictional yacht. Every name, figure and document in these screens is invented. Click the highlighted spot, or use Next or the arrow keys.</p>
-  </aside>
+<main id="main" class="shell">
 
-  <div class="stage-wrap">
-    <div class="stage-bar">
-      <div class="theme-switch" role="group" aria-label="Screens">
-        <button type="button" data-scheme="light" aria-pressed="true">Light</button>
-        <button type="button" data-scheme="dark" aria-pressed="false">Dark</button>
+  <section class="dept-pick" id="pick" aria-labelledby="pick-title">
+    <h1 id="pick-title">Who are you on board?</h1>
+    <p class="lead">Pick a department and you're signed in to M/Y Example, a fictional yacht, as that person. Click around to see what they see: their dashboard, their tasks, their part of the vessel database.</p>
+    <ul class="dept-cards" id="dept-cards"></ul>
+    <p class="demo-disclaimer">Every name, figure and document in the demo is invented. Links work; buttons that would save something don't, so nothing you do here changes anything.</p>
+  </section>
+
+  <section class="viewer" id="viewer" hidden aria-label="Demo">
+    <div class="viewer-bar">
+      <div class="dept-tabs" id="dept-tabs" role="group" aria-label="Department"></div>
+      <div class="viewer-switches">
+        <div class="theme-switch" role="group" aria-label="Device">
+          <button type="button" data-device="c" aria-pressed="true">Computer</button>
+          <button type="button" data-device="p" aria-pressed="false">Phone</button>
+        </div>
+        <div class="theme-switch" role="group" aria-label="Screens">
+          <button type="button" data-scheme="l" aria-pressed="true">Light</button>
+          <button type="button" data-scheme="d" aria-pressed="false">Dark</button>
+        </div>
       </div>
     </div>
-    <div class="stage" id="stage">
-      <img id="stage-img" alt="" />
-    </div>
-    <div class="caption" aria-live="polite">
-      <div>
-        <div class="count" id="step-count"></div>
-        <h3 id="step-title"></h3>
-        <p id="step-text"></p>
+
+    <div class="browser" id="browser">
+      <div class="browser-bar">
+        <button type="button" class="bb-btn" id="go-back" aria-label="Back">‹</button>
+        <button type="button" class="bb-btn" id="go-home" aria-label="Dashboard">⌂</button>
+        <div class="address" id="address" aria-live="polite"></div>
+        <button type="button" class="bb-btn bb-text" id="show-spots" aria-pressed="false">Show Links</button>
       </div>
-      <div class="controls">
-        <button class="btn btn-ghost" id="prev" type="button">Back</button>
-        <button class="btn btn-primary" id="next" type="button">Next</button>
+      <div class="screen" id="screen">
+        <div class="shot" id="shot">
+          <img id="shot-img" alt="" />
+        </div>
+        <div class="coach" id="coach" hidden>
+          <p id="coach-text"></p>
+          <button type="button" class="btn btn-primary" id="coach-ok">Got It</button>
+        </div>
       </div>
-      <div class="dots" id="dots" aria-hidden="true"></div>
     </div>
-  </div>
+
+    <div class="viewer-foot">
+      <div class="try" id="try">
+        <span class="try-label">Try:</span>
+        <ul id="try-list"></ul>
+      </div>
+      <p class="viewer-note">Click anything that's a link in the app, or use Back and ⌂. Saving isn't part of the demo, so buttons don't do anything here.</p>
+    </div>
+  </section>
+
 </main>
 
 <footer class="site-footer">
@@ -68,7 +89,7 @@
   </div>
 </footer>
 
-<script src="/assets/tours.js"></script>
+<script src="/assets/demo.js"></script>
 <script src="/assets/site.js"></script>
 </body>
 </html>
