@@ -49,7 +49,10 @@
     var a = t.closest("a[href]");
     if (a) {
       var kind = a.getAttribute("data-demo");
-      if (kind) { e.preventDefault(); toast(kind === "out" ? "That link leaves the vessel's system, so it's switched off here." : "That page isn't part of this demo."); }
+      if (kind) { e.preventDefault(); toast(kind === "out" ? "That link leaves the vessel's system, so it's switched off here." : "That page isn't part of this demo."); return; }
+      // The live site serves a copy at its address without ".html"; going straight there saves a redirect.
+      var href = a.getAttribute("href");
+      if (/^\d+\.html$/.test(href) && !/^(localhost|127\.)/.test(location.hostname) && !e.ctrlKey && !e.metaKey && !e.shiftKey) { e.preventDefault(); location.href = href.slice(0, -5); }
       return;
     }
     if (t.closest("summary")) return;
