@@ -165,17 +165,9 @@ section { padding: 5rem 0; }
 .bb-btn.bb-text[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); }
 .address { flex: 1; min-width: 0; font-size: 0.85rem; color: var(--muted); background: var(--card); border-radius: 999px; padding: 0.35rem 0.9rem;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.screen { position: relative; height: min(76vh, 860px); overflow-y: auto; overscroll-behavior: contain; background: #fff; }
+.screen { position: relative; height: min(78vh, 900px); overflow: hidden; background: #fff; }
 .browser.is-dark .screen { background: #0f1416; }
-.shot { position: relative; }
-.shot img { width: 100%; height: auto; }
-.spot { position: absolute; border-radius: 6px; outline: 2px solid transparent; outline-offset: 1px; transition: outline-color 0.15s, background 0.15s; }
-.spot:hover, .spot:focus-visible { outline-color: var(--gold); background: rgba(232, 176, 75, 0.14); }
-.show-spots .spot { outline-color: var(--gold); background: rgba(232, 176, 75, 0.16); }
-@media (prefers-reduced-motion: no-preference) {
-  .shot.flash .spot { animation: spot-flash 1.1s ease-out; }
-}
-@keyframes spot-flash { 0%, 60% { outline-color: var(--gold); background: rgba(232, 176, 75, 0.22); } 100% { outline-color: transparent; background: transparent; } }
+.screen iframe { display: block; border: 0; transform-origin: 0 0; background: transparent; }
 
 /* Phone: a phone-shaped frame around the same screen. */
 .browser.is-phone { width: min(100%, 410px); margin: 0 auto; border-radius: 34px; border: 10px solid #151c1e; background: #151c1e; }
@@ -185,9 +177,9 @@ section { padding: 5rem 0; }
 .browser.is-phone .bb-btn.bb-text { background: #26302f; border-color: #26302f; color: #eef4f3; }
 .browser.is-phone .bb-btn.bb-text[aria-pressed="true"] { background: var(--gold); color: var(--ink); }
 .browser.is-phone .address { background: #26302f; color: #b5c9c7; font-size: 0.78rem; }
-.browser.is-phone .screen { height: min(74vh, 760px); border-radius: 0 0 24px 24px; scrollbar-width: none; }
+.browser.is-phone .screen { height: min(76vh, 780px); border-radius: 0 0 24px 24px; }
 
-.coach { position: sticky; bottom: 1rem; margin: 0 auto 1rem; width: min(calc(100% - 2rem), 30rem); z-index: 2; display: flex; gap: 1rem; align-items: center;
+.coach { position: absolute; left: 50%; transform: translateX(-50%); bottom: 1rem; width: min(calc(100% - 2rem), 30rem); z-index: 2; display: flex; gap: 1rem; align-items: center;
   background: var(--teal-deep); color: var(--on-dark); border-radius: var(--radius); padding: 1rem 1.1rem; box-shadow: var(--shadow); }
 .coach[hidden] { display: none; }
 .coach p { margin: 0; font-size: 0.92rem; line-height: 1.45; }

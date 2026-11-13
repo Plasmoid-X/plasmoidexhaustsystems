@@ -1,6 +1,6 @@
-// Rocinante demo: pick a department, then click around pictures of the real app as that person.
-// The pictures and the positions of their links are made by rocinante-site-tools/crawl.js into /demo/<id>.json
-// and /demo/<id>/<c|cd|p|pd>/<n>.webp (c = computer, p = phone, d = dark).
+// Rocinante demo: pick a department, then use copies of the app's real screens as that person.
+// The copies are made by rocinante-site-tools/snap.js into /demo/<id>/<n>.html (+ /demo/<id>.json, the page
+// list); /demo/frame.js runs inside each one and reports which page is showing.
 (function () {
   const DEPTS = [
     { id: "captain", dept: "Captain", who: "Captain", blurb: "Every department on one page, certificates, the crew rotation and the Captain's Safe." },
@@ -9,112 +9,76 @@
     { id: "deck", dept: "Deck", who: "Bosun", blurb: "Tenders, mooring and life-saving equipment, rounds and the jobs for the deck crew." },
     { id: "interior", dept: "Interior", who: "Chief Stewardess", blurb: "Guest areas, laundry, the wine cellar, interior stores and housekeeping tasks." },
   ];
-  window.ROCINANTE_DEPTS = DEPTS;
 
   // Home page: one card per department, each opening the demo signed in as that person.
   const home = document.getElementById("dept-list");
-  if (home) home.innerHTML = DEPTS.map((d) => `<li><a href="/demo.html#${d.id}"><strong>${d.dept}</strong><span class="who">as the ${d.who}</span><span class="blurb">${d.blurb}</span><span class="go">Open ›</span></a></li>`).join("");
+  if (home) home.innerHTML = DEPTS.map((d) => `<li><a href="/demo#${d.id}"><strong>${d.dept}</strong><span class="who">as the ${d.who}</span><span class="blurb">${d.blurb}</span><span class="go">Open ›</span></a></li>`).join("");
 
   const viewer = document.getElementById("viewer");
   if (!viewer) return;
 
   const $ = (id) => document.getElementById(id);
-  const pick = $("pick"), cards = $("dept-cards"), tabs = $("dept-tabs"), screen = $("screen"), shot = $("shot"), img = $("shot-img");
-  const address = $("address"), backBtn = $("go-back"), homeBtn = $("go-home"), spotsBtn = $("show-spots");
-  const coach = $("coach"), coachText = $("coach-text"), tryList = $("try-list");
+  const pick = $("pick"), cards = $("dept-cards"), tabs = $("dept-tabs"), browser = $("browser"), screen = $("screen"), frame = $("frame");
+  const address = $("address"), spotsBtn = $("show-spots"), coach = $("coach"), coachText = $("coach-text"), tryList = $("try-list");
   const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
 
-  let device = store.get("rocinante-demo-device") === "p" ? "p" : (store.get("rocinante-demo-device") === "c" ? "c" : (matchMedia("(max-width: 680px)").matches ? "p" : "c"));
+  const saved = store.get("rocinante-demo-device");
+  let device = saved === "p" || saved === "c" ? saved : (matchMedia("(max-width: 680px)").matches ? "p" : "c");
   let scheme = store.get("rocinante-demo-scheme") === "dark" ? "d" : "l";
-  let data = null, persona = null, at = 0; // at = page index, or "menu" (the phone's menu)
+  let showLinks = false;
+  let data = null, persona = null;
+  let showing = null; // "<id>/<n>" the frame last reported
   const cache = new Map();
 
   cards.innerHTML = DEPTS.map((d) => `<li><a class="dept-card" href="#${d.id}"><span class="dept-name">${d.dept}</span><span class="dept-who">as the ${d.who}</span><span class="dept-blurb">${d.blurb}</span><span class="go">Open ›</span></a></li>`).join("");
   tabs.innerHTML = DEPTS.map((d) => `<a href="#${d.id}" data-id="${d.id}"><strong>${d.dept}</strong><span>${d.who === d.dept ? "Whole Vessel" : d.who}</span></a>`).join("");
 
-  async function load(id) {
+  const load = (id) => {
     if (!cache.has(id)) cache.set(id, fetch(`/demo/${id}.json`).then((r) => { if (!r.ok) throw new Error(); return r.json(); }));
     return cache.get(id);
-  }
-  const variant = () => device + (scheme === "d" ? "d" : "");
-  const src = (i) => `/demo/${persona.id}/${variant()}/${i}.webp`;
-  const pageOf = (i) => (i === "menu" ? null : data.pages[i]);
-  const view = (i) => (i === "menu" ? data.menu : data.pages[i][device]);
+  };
+  const send = (msg) => { try { frame.contentWindow.postMessage(msg, location.origin); } catch {} };
 
-  // The phone shows its own pages; a page the phone robot couldn't open falls back to the computer picture.
-  function picture(i) {
-    if (i === "menu") return { url: src("menu"), v: data.menu };
-    const p = data.pages[i];
-    if (p[device]) return { url: src(i), v: p[device] };
-    return { url: `/demo/${persona.id}/c${scheme === "d" ? "d" : ""}/${i}.webp`, v: p.c };
+  // The frame is drawn at a real computer or phone width and scaled to fit, so the app lays itself out properly.
+  function fit() {
+    const phone = device === "p";
+    browser.classList.toggle("is-phone", phone);
+    browser.classList.toggle("is-dark", scheme === "d");
+    const w = screen.clientWidth, h = screen.clientHeight;
+    const logical = phone ? 390 : Math.max(w, 1280);
+    const scale = Math.min(1, w / logical);
+    frame.style.width = `${logical}px`;
+    frame.style.height = `${h / scale}px`;
+    frame.style.transform = scale === 1 ? "" : `scale(${scale})`;
   }
 
   function setPressed() {
     document.querySelectorAll("[data-device]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.device === device)));
     document.querySelectorAll("[data-scheme]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.scheme === scheme)));
+    spotsBtn.setAttribute("aria-pressed", String(showLinks));
     tabs.querySelectorAll("a").forEach((a) => a.setAttribute("aria-current", String(persona && a.dataset.id === persona.id)));
     const cur = persona && tabs.querySelector(`[data-id="${persona.id}"]`);
     if (cur) tabs.scrollLeft += cur.getBoundingClientRect().left - tabs.getBoundingClientRect().left - (tabs.clientWidth - cur.offsetWidth) / 2;
   }
 
-  function render(scrollTop) {
-    const pic = picture(at);
-    if (!pic.v) return;
-    $("browser").classList.toggle("is-phone", device === "p");
-    $("browser").classList.toggle("is-dark", scheme === "d");
-    img.src = pic.url;
-    img.width = pic.v.w; img.height = pic.v.h;
-    shot.style.aspectRatio = `${pic.v.w} / ${pic.v.h}`;
-    const p = pageOf(at);
-    img.alt = at === "menu" ? "The app's menu on a phone." : `${p.title}, as the ${persona.who} sees it.`;
-    address.textContent = "m-y-example.vessel" + (at === "menu" ? "/dashboard  ·  menu" : p.path);
-    document.title = `${at === "menu" ? "Menu" : p.title} · ${persona.dept} | Rocinante Demo`;
-    shot.querySelectorAll(".spot").forEach((s) => s.remove());
-    const spots = (pic.v.spots || []).slice();
-    // On the phone, the ☰ button opens the menu picture.
-    if (device === "p" && data.menuButton && pic.v === view(at)) {
-      const [x, y, w, h] = data.menuButton;
-      spots.push([x, y / pic.v.h, w, h / pic.v.h, at === "menu" ? "back" : "menu"]);
-    }
-    const seen = new Set();
-    for (const [x, y, w, h, t] of spots) {
-      const k = `${x},${y},${t}`;
-      if (seen.has(k)) continue;
-      seen.add(k);
-      const a = document.createElement("a");
-      a.className = "spot";
-      a.href = t === "back" ? "#" : `#${persona.id}/${t}`;
-      if (t === "back") a.addEventListener("click", (e) => { e.preventDefault(); history.back(); });
-      a.setAttribute("aria-label", t === "menu" ? "Open the menu" : t === "back" ? "Close the menu" : `Go to ${data.pages[t].title}`);
-      Object.assign(a.style, { left: `${x * 100}%`, top: `${y * 100}%`, width: `${w * 100}%`, height: `${h * 100}%` });
-      shot.appendChild(a);
-    }
-    backBtn.disabled = history.length < 2;
-    setPressed();
-    if (scrollTop) screen.scrollTop = 0;
-    // Fetch the pages this one links to, so the next click is instant.
-    setTimeout(() => spots.slice(0, 40).forEach(([, , , , t]) => { if (t === "back") return; const q = picture(t); if (q.v) { const im = new Image(); im.src = q.url; } }), 300);
-  }
-
   function renderTry() {
-    const want = [[/^\/dashboard$/, "Dashboard"], [/^\/tasks$/, "Tasks"], [/^\/tasks\/./, null], [/^\/category\/[^/]+\/system\//, null],
-      [/^\/departments$/, "Departments overview"], [/^\/logbook$/, "Logbook"], [/^\/rounds$/, "Rounds"], [/^\/inventory$/, "Inventory"], [/^\/cellar$/, "Wine Cellar"], [/^\/rotation$/, "Crew Rotation"]];
+    const want = [[/^\/dashboard$/, "Dashboard"], [/^\/tasks$/, "Tasks"], [/^\/tasks\/[^?]+$/, null], [/^\/category\/[^/]+\/system\/[^?]+$/, null],
+      [/^\/departments$/, "Departments Overview"], [/^\/logbook$/, "Logbook"], [/^\/rounds$/, "Rounds"], [/^\/cellar$/, "Wine Cellar"], [/^\/inventory$/, "Inventory"], [/^\/rotation$/, "Crew Rotation"], [/^\/obligations$/, "Certificates"]];
     const items = [];
     for (const [re, label] of want) {
       const i = data.pages.findIndex((p) => re.test(p.path));
       if (i >= 0 && !items.some((x) => x.i === i)) items.push({ i, label: label || data.pages[i].title });
-      if (items.length >= 6) break;
+      if (items.length >= 7) break;
     }
-    if (device === "p" && data.menu) items.splice(1, 0, { i: "menu", label: "The phone menu" });
     tryList.innerHTML = items.map((x) => `<li><a href="#${persona.id}/${x.i}">${x.label}</a></li>`).join("");
   }
 
   function showCoach() {
-    const key = `rocinante-demo-coach-${device}`;
+    const key = `rocinante-demo-coach2-${device}`;
     if (store.get(key)) { coach.hidden = true; return; }
     coachText.textContent = device === "p"
-      ? `You're signed in as the ${persona.who}, on a phone. Tap ☰ for the menu, or anything that's a link. "Show Links" marks them all.`
-      : `You're signed in as the ${persona.who}. Click the menu on the left or anything that's a link. "Show Links" marks them all.`;
+      ? `You're signed in as the ${persona.who}, on a phone. Scroll, tap Menu, and open anything, just as on board.`
+      : `You're signed in as the ${persona.who}. Use the menu on the left and open anything, just as on board.`;
     coach.hidden = false;
     $("coach-ok").onclick = () => { store.set(key, "1"); coach.hidden = true; };
   }
@@ -122,41 +86,47 @@
   async function route() {
     const [id, rest] = location.hash.slice(1).split("/");
     const d = DEPTS.find((x) => x.id === id);
-    if (!d) { pick.hidden = false; viewer.hidden = true; document.title = "Rocinante Demo | Try It as Your Department"; return; }
+    if (!d) { pick.hidden = false; viewer.hidden = true; persona = null; showing = null; document.title = "Rocinante Demo | Try It as Your Department"; return; }
     let json;
     try { json = await load(id); } catch { pick.hidden = false; viewer.hidden = true; return; }
     const changed = persona !== d;
     persona = d; data = json;
-    const next = rest === "menu" ? (data.menu ? "menu" : 0) : Math.min(Math.max(parseInt(rest || "0", 10) || 0, 0), data.pages.length - 1);
-    const moved = changed || next !== at;
-    at = next;
+    const n = Math.min(Math.max(parseInt(rest || "0", 10) || 0, 0), data.pages.length - 1);
     pick.hidden = true; viewer.hidden = false;
-    render(moved);
-    if (changed) { renderTry(); showCoach(); }
-    if (changed) viewer.scrollIntoView({ block: "start" });
+    fit(); setPressed();
+    if (showing !== `${id}/${n}`) {
+      showing = `${id}/${n}`;
+      const url = `/demo/${id}/${n}.html`;
+      // replace(): the address bar's own history entry already stands for this page.
+      if (frame.contentWindow && frame.src) frame.contentWindow.location.replace(url); else frame.src = url;
+    }
+    if (changed) { renderTry(); showCoach(); viewer.scrollIntoView({ block: "start" }); }
   }
+
+  // The frame says which page it is showing (after a click inside it, or Back).
+  window.addEventListener("message", (e) => {
+    if (e.origin !== location.origin || !e.data || e.data.rocinante !== "page") return;
+    const m = e.data;
+    showing = `${m.who}/${m.n}`;
+    address.textContent = "m-y-example.vessel" + m.path;
+    document.title = `${m.title} · ${(DEPTS.find((d) => d.id === m.who) || {}).dept || ""} | Rocinante Demo`;
+    if (location.hash !== `#${showing}`) history.replaceState(null, "", `#${showing}`);
+    if (!persona || persona.id !== m.who) route();
+    if (showLinks) send({ rocinante: "links", on: true });
+  });
 
   document.querySelectorAll("[data-device]").forEach((b) => b.addEventListener("click", () => {
     device = b.dataset.device; store.set("rocinante-demo-device", device);
-    if (at === "menu" && device === "c") { location.hash = `${persona.id}/0`; return; }
-    render(false); renderTry(); showCoach();
+    fit(); setPressed(); if (persona) showCoach();
   }));
   document.querySelectorAll("[data-scheme]").forEach((b) => b.addEventListener("click", () => {
     scheme = b.dataset.scheme; store.set("rocinante-demo-scheme", scheme === "d" ? "dark" : "light");
-    render(false);
+    fit(); setPressed(); send({ rocinante: "theme" });
   }));
-  backBtn.addEventListener("click", () => history.back());
-  homeBtn.addEventListener("click", () => { location.hash = `${persona.id}/0`; });
-  spotsBtn.addEventListener("click", () => {
-    const on = !shot.classList.contains("show-spots");
-    shot.classList.toggle("show-spots", on);
-    spotsBtn.setAttribute("aria-pressed", String(on));
-  });
-  // A click that misses every link flashes them, so people learn where to click.
-  shot.addEventListener("click", (e) => {
-    if (e.target.closest(".spot")) return;
-    shot.classList.remove("flash"); void shot.offsetWidth; shot.classList.add("flash");
-  });
+  $("go-back").addEventListener("click", () => history.back());
+  $("go-home").addEventListener("click", () => { if (persona) location.hash = `${persona.id}/0`; });
+  spotsBtn.addEventListener("click", () => { showLinks = !showLinks; setPressed(); send({ rocinante: "links", on: showLinks }); });
+  window.addEventListener("resize", fit);
   window.addEventListener("hashchange", route);
   route();
 })();
