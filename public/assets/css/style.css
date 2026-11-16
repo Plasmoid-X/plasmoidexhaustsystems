@@ -723,7 +723,10 @@ section { padding: 5.5rem 0; }
 .hero-vajra p.lead { color: rgba(255, 255, 255, 0.8); font-size: 1.14rem; max-width: 34rem; }
 .hero-vajra .btn-outline { background: transparent; border-color: rgba(255, 255, 255, 0.45); }
 .vajra-stage { position: relative; align-self: stretch; min-height: 560px; margin-right: calc((100vw - min(100vw - 48px, var(--max))) / -2); }
-.vajra-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.vajra-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.4s ease;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16%), linear-gradient(to top, transparent 0, #000 12%);
+  -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent 0, #000 16%), linear-gradient(to top, transparent 0, #000 12%); mask-composite: intersect; }
+.vajra-stage.is-3d canvas { opacity: 1; }
 .vajra-fallback { display: none; }
 .vajra-stage.no-webgl canvas, .vajra-stage.no-webgl .vajra-label { display: none; }
 .vajra-stage.no-webgl .vajra-fallback { display: block; width: min(100%, 460px); height: auto; margin: 2rem auto; background: var(--paper); border-radius: 16px; padding: 1rem; }
@@ -738,6 +741,7 @@ section { padding: 5.5rem 0; }
   .hero-copy { display: contents; }
   .hero-vajra h1 { order: 1; margin: 2.2rem 0 0; }
   .vajra-stage { order: 2; }
+  .vajra-stage canvas { -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 8%, #000 92%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 8%, #000 92%, transparent 100%); }
   .hero-vajra p.lead { order: 3; margin-top: 0.5rem; }
   .hero-vajra .hero-actions { order: 4; margin: 1.6rem 0 2.2rem; }
   .vajra-label[data-anchor="core"] { display: none; }
