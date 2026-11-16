@@ -12,18 +12,18 @@ const fs = require('fs'), path = require('path'), crypto = require('crypto');
 
 const BASE = process.env.BASE || 'http://localhost:3120', PW = 'manual-demo-password-1';
 const PERSONAS = [
-  { id: 'captain', dept: 'Captain', who: 'Captain', user: 'demo captain', max: 170 },
-  { id: 'bridge', dept: 'Bridge', who: 'Chief Officer', user: 'jamie lee', max: 150, home: ['bridge', 'deck'] },
-  { id: 'engineering', dept: 'Engineering', who: 'Chief Engineer', user: 'demo chief engineer', max: 160, home: ['engine'] },
-  { id: 'deck', dept: 'Deck', who: 'Bosun', user: 'tom becker', max: 140, home: ['deck'] },
-  { id: 'interior', dept: 'Interior', who: 'Chief Stewardess', user: 'demo chief stew', max: 140, home: ['interior'] },
+  { id: 'captain', dept: 'Captain', who: 'Captain', user: 'demo captain', max: 260 },
+  { id: 'bridge', dept: 'Bridge', who: 'Chief Officer', user: 'jamie lee', max: 220, home: ['bridge', 'deck'] },
+  { id: 'engineering', dept: 'Engineering', who: 'Chief Engineer', user: 'demo chief engineer', max: 230, home: ['engine'] },
+  { id: 'deck', dept: 'Deck', who: 'Bosun', user: 'tom becker', max: 200, home: ['deck'] },
+  { id: 'interior', dept: 'Interior', who: 'Chief Stewardess', user: 'demo chief stew', max: 200, home: ['interior'] },
 ];
 
 // Never visited: anything that changes data, downloads a file, or leaves the demo.
 const SKIP = [/^\/api\//, /^\/logout/, /^\/login/, /^\/setup/, /\/new(\/|$|\?)/, /\/edit(\/|$|\?)/, /\/print/, /\/export/,
   /[?&]dl=/, /\/file(\/|$|\?)/, /\.(pdf|csv|xlsx|docx|png|jpg|webp|zip)(\?|$)/i, /^\/manual/, /^\/privacy/, /^\/about/,
   /^\/confirm/, /^\/admin\/./, /^\/support/, /^\/documents\/drop/, /\/scan(\/|$)/, /^\/assistant\/./, /\/qr(\/|$)/,
-  /^\/safe\/drop/, /^\/records\/reports/, /^\/playbooks/];
+  /^\/safe\/drop/, /^\/records\/reports/, /^\/playbooks/, /\/(remove|delete)(\/|$|\?)/];
 // Query-string keys that don't make a different page.
 const NOISE = new Set(['msg', 'err', 'back', 'next', 'from', 'returnTo', 'return', 'sort', 'dir', 'order', 'page', 'cols', 'q', 'cal', 'saved']);
 const ID = /^(c[a-z0-9]{20,30}|[0-9a-f-]{32,36}|\d+|\d{4}-\d{2}(-\d{2})?)$/;
@@ -152,6 +152,10 @@ async function crawl(browser, P, outDir) {
     const cap = (CAP.find(([re]) => re.test(s)) || [null, Infinity])[1];
     const own = P.home && P.home.some((d) => key === `/department/${d}` || key.startsWith(`/department/${d}/`));
     if (!own && (counts.get(s) || 0) >= cap) return false;
+    // A list's tabs and filters: a few of each list, not every combination.
+    const qk = key.includes('?') ? 'Q:' + shape(key).split('?')[0] : null;
+    if (qk && (counts.get(qk) || 0) >= (key.split('&').length > 1 ? 3 : 8)) return false;
+    if (qk) counts.set(qk, (counts.get(qk) || 0) + 1);
     counts.set(s, (counts.get(s) || 0) + 1);
     seen.add(key);
     return true;
@@ -178,8 +182,8 @@ async function crawl(browser, P, outDir) {
       const d = l.nav && depth === 0 ? 1 : depth + 1;
       const imp = IMPORTANT.findIndex((re) => re.test(shape(k)));
       // The menu, then a list's own tabs and filters, then the detail pages people open most, then the rest.
-      const sameList = k.split('?')[0] === key.split('?')[0] && depth <= 1;
-      queue.push({ key: k, depth: d, prio: d <= 1 ? d : sameList ? 5 : 10 + (imp < 0 ? 50 : imp) + d * 100, n: order++ });
+      const sameList = k.split('?')[0] === key.split('?')[0] && depth <= 1 && !k.includes('&');
+      queue.push({ key: k, depth: d, prio: d <= 1 ? d : sameList ? 5 : 10 + (imp < 0 ? (k.includes('?') ? 80 : 50) : imp) + Math.min(d, 3) * 100, n: order++ });
     }
     queue.sort((a, b) => a.prio - b.prio || a.n - b.n);
   }
