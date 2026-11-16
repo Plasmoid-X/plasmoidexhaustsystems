@@ -694,7 +694,54 @@ section { padding: 5.5rem 0; }
 
 /* ---------- Home page: Rocinante, the company's other product ---------- */
 .also-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 3.5rem; align-items: center; }
-.also-logo { height: 40px; width: auto; margin: 0.6rem 0 1.6rem; }
+.also-logo { height: 40px; width: auto; margin: 0 0 1.6rem; }
 .also-shot { display: block; border-radius: 12px; overflow: hidden; border: 1px solid rgba(11, 26, 21, 0.12); box-shadow: 0 18px 40px rgba(11, 26, 21, 0.14); }
 .also-shot img { display: block; width: 100%; height: auto; }
 @media (max-width: 860px) { .also-grid { grid-template-columns: 1fr; gap: 2rem; } }
+
+/* ---------- Home hero: the Vajra, live ---------- */
+.site-header.on-dark { background: #050d0a; border-bottom-color: rgba(255, 255, 255, 0.08); }
+.site-header.on-dark .brand, .site-header.on-dark .menu-toggle { color: var(--white); }
+.site-header.on-dark .nav-links a { color: rgba(255, 255, 255, 0.82); }
+.site-header.on-dark .nav-links a.active, .site-header.on-dark .nav-links a:hover { color: var(--uranian-blue); }
+.site-header.on-dark .nav-cta { background: var(--white); color: var(--ink) !important; }
+.site-header.on-dark .nav-cta:hover { background: var(--uranian-blue); }
+.site-header.on-dark :focus-visible { outline-color: var(--uranian-blue); }
+
+.hero-vajra {
+  padding: 76px 0 0;
+  background:
+    radial-gradient(60% 70% at 74% 46%, rgba(45, 132, 138, 0.2), transparent 70%),
+    radial-gradient(40% 50% at 78% 70%, rgba(255, 106, 42, 0.08), transparent 70%),
+    #050d0a;
+  overflow: hidden;
+}
+.hero-vajra-grid { display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr); align-items: center; gap: 1rem; min-height: min(calc(100vh - 140px), 800px); }
+.hero-copy { padding: 3rem 0; }
+.hero-vajra h1 { font-size: clamp(2.3rem, 3.9vw, 3.6rem); line-height: 1.05; letter-spacing: -0.015em; text-wrap: balance; margin-bottom: 1.6rem; }
+.hero-vajra h1 span { display: block; color: #ffb27a; }
+.hero-vajra p.lead { color: rgba(255, 255, 255, 0.8); font-size: 1.14rem; max-width: 34rem; }
+.hero-vajra .btn-outline { background: transparent; border-color: rgba(255, 255, 255, 0.45); }
+.vajra-stage { position: relative; align-self: stretch; min-height: 560px; margin-right: calc((100vw - min(100vw - 48px, var(--max))) / -2); }
+.vajra-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.vajra-fallback { display: none; }
+.vajra-stage.no-webgl canvas, .vajra-stage.no-webgl .vajra-label { display: none; }
+.vajra-stage.no-webgl .vajra-fallback { display: block; width: min(100%, 460px); height: auto; margin: 2rem auto; background: var(--paper); border-radius: 16px; padding: 1rem; }
+.vajra-label { position: absolute; left: 0; top: 0; margin: 0; pointer-events: none; opacity: 0; transition: opacity 0.6s ease 0.3s; will-change: transform; }
+.vajra-stage.is-live .vajra-label { opacity: 1; }
+.vajra-label span { position: absolute; left: 0; top: 0; transform: translate(calc(var(--lead, 64px) + 10px), -50%); white-space: nowrap; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.01em; color: rgba(255, 255, 255, 0.92); }
+.vajra-label::before { content: ""; position: absolute; left: 0; top: 0; width: var(--lead, 64px); height: 1px; background: rgba(255, 255, 255, 0.55); }
+.vajra-label::after { content: ""; position: absolute; left: -3px; top: -3px; width: 7px; height: 7px; border-radius: 50%; background: var(--white); }
+.vajra-caption { padding: 0 0 2.2rem; margin-top: -1rem; font-size: 0.88rem; color: rgba(255, 255, 255, 0.58); position: relative; }
+@media (max-width: 900px) {
+  .hero-vajra-grid { grid-template-columns: 1fr; min-height: 0; gap: 0; }
+  .hero-copy { display: contents; }
+  .hero-vajra h1 { order: 1; margin: 2.2rem 0 0; }
+  .vajra-stage { order: 2; }
+  .hero-vajra p.lead { order: 3; margin-top: 0.5rem; }
+  .hero-vajra .hero-actions { order: 4; margin: 1.6rem 0 2.2rem; }
+  .vajra-label[data-anchor="core"] { display: none; }
+  .vajra-stage { min-height: 0; height: min(112vw, 560px); margin: 0 -24px; }
+  .vajra-label span { font-size: 0.74rem; white-space: normal; width: 6.5rem; line-height: 1.25; }
+  .vajra-caption { margin-top: 0; }
+}
