@@ -56,7 +56,9 @@ the complete retrofit; Plasmoid X oversees every installation.
   with a released same-engine baseline exists yet; an independent diesel baseline has been taken and its results are
   awaited. The accredited laboratory results that exist are on small petrol engines and are mixed (fuel use and CO
   down, NOx up). Until a diesel result with a baseline exists: no numbers on the site, no claim that the system
-  lowers NOx or replaces a certified SCR system, and "designed to" wording only.
+  lowers NOx, and "designed to" wording only. The owner's position is that the system is a substitute for existing
+  emission equipment; the site neither claims nor denies that, and says only that changes to certified emission
+  equipment need flag or class approval (agreed 17 Nov 2026).
 - CAD or drawings of the Vajra and ionizer are to come from the owner; until then the 3D model is built from the
   owner's description and the existing system diagram (`public/assets/img/plasmoid-x-system.svg`).
 - No customer names, testimonials or installation photos exist; never invent them.
