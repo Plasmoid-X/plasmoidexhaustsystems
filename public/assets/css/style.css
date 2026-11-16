@@ -745,3 +745,5 @@ section { padding: 5.5rem 0; }
   .vajra-label span { font-size: 0.74rem; white-space: normal; width: 6.5rem; line-height: 1.25; }
   .vajra-caption { margin-top: 0; }
 }
+
+.compare tfoot td:last-child { padding-top: 1rem; font-size: 0.86rem; font-weight: 400; color: var(--muted); border-bottom: 0; }
