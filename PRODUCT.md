@@ -52,9 +52,13 @@ the complete retrofit; Plasmoid X oversees every installation.
 - Sister product: Rocinante (rocinante.plasmoidx.co.uk), planned maintenance for yachts.
 
 ## Evidence on Hand
-- The owner has bench or prototype figures and CAD or drawings of the Vajra and ionizer, not yet supplied (16 Nov 2026).
-  Until they arrive: no numbers on the site, and the 3D model is built from the owner's description and the existing
-  system diagram (`public/assets/img/plasmoid-x-system.svg`).
+- Test evidence reviewed with the owner on 16 Nov 2026 (the owner's own summary of every test held). No diesel test
+  with a released same-engine baseline exists yet; an independent diesel baseline has been taken and its results are
+  awaited. The accredited laboratory results that exist are on small petrol engines and are mixed (fuel use and CO
+  down, NOx up). Until a diesel result with a baseline exists: no numbers on the site, no claim that the system
+  lowers NOx or replaces a certified SCR system, and "designed to" wording only.
+- CAD or drawings of the Vajra and ionizer are to come from the owner; until then the 3D model is built from the
+  owner's description and the existing system diagram (`public/assets/img/plasmoid-x-system.svg`).
 - No customer names, testimonials or installation photos exist; never invent them.
 
 ## Product Principles
