@@ -23,9 +23,11 @@ going in: no filter media to clog, no chemicals to dose, and it connects to the 
 
 ## Operating Context
 How the system works (owner's description):
-1. Air in: fresh air is drawn into the system instead of going straight into the turbo.
-2. Ionizer: the air bubbles through water under UV light, which turns it into plasmoids; filters keep the water out of
-   the engine.
+1. UV ionizer: fresh air is drawn into the system instead of going straight into the turbo, and is exposed to UV light
+   on the way in (for example LEDs along the inlet tube). The ionizer is simple and can take many forms. The owner
+   does not recall the wavelength: never state one.
+2. Bubbler: the ionized air bubbles through water; filters keep the water out of the engine. The owner has built
+   one. (The site says the air "leaves as plasmoids" here: the owner has not yet confirmed at which step they form.)
 3. Vajra: two linked stainless spheres. The plasmoid air spirals down through the inner chamber around a sealed
    stainless core sphere in each one (tornado-like swirl).
 4. Counter-flow heat exchange: hot exhaust spirals the opposite way (upwards) through the thin-walled outer chamber and
@@ -40,6 +42,12 @@ the complete retrofit; Plasmoid X oversees every installation.
 - Static site: plain HTML/CSS/JS in `public/`, hosted on Cloudflare Pages (production branch `main`, live at
   plasmoidx.co.uk). No build step.
 - Enquiries only by the form (Web3Forms); the owner handles them by email.
+- The system is sealed and airtight: any drawing of it must join every pipe end to end, with nothing open but the
+  filtered intake and the exhaust outlet.
+- Pages stay clean and easy to read; no section may take over scrolling. The live "follow the air" player is on the
+  Technology page and plays once, then stops (owner, 17 Nov 2026).
+- The founder is described as an engineer, not a "yacht engineer"; he has a long interest in plasma physics and
+  believes it is at the start of a new age.
 - Never use "aboard": "on board", two words.
 - No "trial", "in development" or "unfinished" wording (owner).
 - Claims stay as "designed to" until measured figures are supplied.

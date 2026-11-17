@@ -13,6 +13,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/style.css" />
 <script>document.documentElement.classList.add("js");</script>
+<script type="importmap">{"imports":{"three":"/assets/js/vendor/three.module.min.js"}}</script>
+<script type="module" src="/assets/js/story.js"></script>
 </head>
 <body>
 
@@ -45,49 +47,43 @@
     </div>
   </section>
 
-  <section class="section-alt">
+  <section class="section-alt story" id="how-it-works" data-story>
     <div class="shell">
       <div class="section-header center">
         <span class="badge">How It Works</span>
         <h2>Six stages, from air in to exhaust out</h2>
       </div>
-      <figure class="system-figure wide">
-        <span class="diagram-anim">
-          <img src="/assets/img/plasmoid-x-system.svg" width="700" height="905" alt="Plasmoid X system diagram. Air enters an ionizer containing water and UV light, then passes through two linked stainless spheres. Exhaust flows the opposite way through an outer chamber before leaving the boat, and the treated air feeds the turbo and engine.">
-          <canvas class="diagram-swirl" aria-hidden="true"></canvas>
-        </span>
-      </figure>
-      <div class="steps steps-3">
-        <div class="step" data-reveal>
-          <div class="step-num">1</div>
-          <h3>Air in</h3>
-          <p>Fresh air is drawn into the system instead of going straight into the turbo.</p>
+      <div class="story-pin" tabindex="-1">
+        <canvas class="story-canvas" aria-hidden="true"></canvas>
+        <p class="story-tag" data-tag="ionizer" aria-hidden="true">UV ionizer</p>
+        <p class="story-tag" data-tag="bubbler" aria-hidden="true">Bubbler</p>
+        <p class="story-tag" data-tag="vajra" aria-hidden="true">Vajra</p>
+        <p class="story-tag" data-tag="turbo" aria-hidden="true">Turbo</p>
+        <p class="story-tag" data-tag="engine" aria-hidden="true">Engine</p>
+        <div class="story-shell">
+          <p class="story-lede">The whole system, from the air intake to the exhaust outlet. Press Play to follow it through, or pick a stage.</p>
+          <ol class="step-key story-steps">
+            <li><span class="step-num" aria-hidden="true">1</span><div><h3>UV ionizer</h3><p>Fresh air is drawn in through a filter and along a tube lit with UV light, instead of going straight into the turbo.</p></div></li>
+            <li><span class="step-num" aria-hidden="true">2</span><div><h3>Bubbler</h3><p>The ionized air bubbles up through water and leaves as plasmoids. A filter keeps the water out of the engine.</p></div></li>
+            <li><span class="step-num" aria-hidden="true">3</span><div><h3>Vajra</h3><p>The plasmoid air spirals through the inner chamber of two linked stainless spheres. A sealed core sphere in each one keeps it swirling.</p></div></li>
+            <li><span class="step-num" aria-hidden="true">4</span><div><h3>Counter-flow heat exchange</h3><p>Hot exhaust spirals the opposite way through the outer chamber and passes heat through the wall into the plasmoids.</p></div></li>
+            <li><span class="step-num" aria-hidden="true">5</span><div><h3>Into the engine</h3><p>The warmed plasmoids feed the turbo inlet in place of ordinary intake air. They are designed to give a more complete burn.</p></div></li>
+            <li><span class="step-num" aria-hidden="true">6</span><div><h3>Exhaust out</h3><p>The exhaust, now cooler, leaves through the outer chamber and out of the boat.</p></div></li>
+          </ol>
+          <div class="story-controls">
+            <button type="button" class="story-play" data-story-play aria-pressed="false">Play</button>
+            <button type="button" data-story-back aria-label="Previous stage">Back</button>
+            <button type="button" data-story-next aria-label="Next stage">Next</button>
+          </div>
         </div>
-        <div class="step" data-reveal>
-          <div class="step-num">2</div>
-          <h3>Ionizer</h3>
-          <p>The air bubbles through water and passes under UV light, which turns it into stable plasma, or plasmoids. Filters keep the water out of the engine.</p>
-        </div>
-        <div class="step" data-reveal>
-          <div class="step-num">3</div>
-          <h3>Vajra</h3>
-          <p>The plasmoid air spirals through the inner chamber of two linked stainless spheres. A sealed core sphere in each one keeps it swirling.</p>
-        </div>
-        <div class="step" data-reveal>
-          <div class="step-num">4</div>
-          <h3>Counter-flow heat exchange</h3>
-          <p>Hot exhaust spirals the opposite way through the outer chamber and passes heat through the wall into the plasmoids.</p>
-        </div>
-        <div class="step" data-reveal>
-          <div class="step-num">5</div>
-          <h3>Into the engine</h3>
-          <p>The warmed plasmoids feed the turbo inlet in place of ordinary intake air. They are designed to give a more complete burn.</p>
-        </div>
-        <div class="step" data-reveal>
-          <div class="step-num">6</div>
-          <h3>Exhaust out</h3>
-          <p>The exhaust, now cooler, leaves through the outer chamber and out of the boat.</p>
-        </div>
+        <ol class="story-rail" aria-label="Stages"></ol>
+        <p class="story-note">The UV ionizer, bubbler, pipe runs, turbo and engine are drawn to show how the system connects. They are not to scale.</p>
+        <figure class="system-figure wide story-fallback">
+          <span class="diagram-anim">
+            <img src="/assets/img/plasmoid-x-system.svg" width="700" height="905" alt="Plasmoid X system diagram. Air passes a UV ionizer and a water bubbler, then through two linked stainless spheres, the Vajra, where it is warmed by the exhaust spiralling the other way, and on to the turbo and engine.">
+            <canvas class="diagram-swirl" aria-hidden="true"></canvas>
+          </span>
+        </figure>
       </div>
       <div class="note-band">
         <p><strong>Better at higher loads.</strong> A harder-working engine runs hotter and moves more air, and both help the system produce plasmoids.</p>
