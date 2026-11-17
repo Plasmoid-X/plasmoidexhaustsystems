@@ -15,6 +15,7 @@
 <script>document.documentElement.classList.add("js");</script>
 <script type="importmap">{"imports":{"three":"/assets/js/vendor/three.module.min.js"}}</script>
 <script type="module" src="/assets/js/vajra.js"></script>
+<script type="module" src="/assets/js/story.js"></script>
 </head>
 <body>
 
@@ -86,8 +87,14 @@
     </div>
   </section>
 
-  <section class="system" id="how-it-works">
-    <div class="shell">
+  <section class="system" id="how-it-works" data-story>
+    <div class="story-pin">
+    <canvas class="story-canvas" aria-hidden="true"></canvas>
+    <p class="story-tag" data-tag="ionizer" aria-hidden="true">Ionizer</p>
+    <p class="story-tag" data-tag="vajra" aria-hidden="true">Vajra</p>
+    <p class="story-tag" data-tag="turbo" aria-hidden="true">Turbo</p>
+    <p class="story-tag" data-tag="engine" aria-hidden="true">Engine</p>
+    <div class="shell story-shell">
       <h2 class="system-title">Follow the air: six stages from intake to exhaust</h2>
       <div class="system-grid">
         <a class="system-figure" href="/assets/img/plasmoid-x-system.svg" aria-label="Open the system diagram full size">
@@ -109,6 +116,10 @@
           <a class="text-link" href="/technology.html">Read the full technology</a>
         </div>
       </div>
+      <p class="story-scroll" aria-hidden="true">Scroll to follow it through</p>
+    </div>
+    <ol class="story-rail" aria-label="Stages"></ol>
+    <p class="story-note">The ionizer, pipe runs, turbo and engine are drawn to show how the system connects. They are not to scale.</p>
     </div>
   </section>
 
