@@ -59,8 +59,11 @@ the complete retrofit; Plasmoid X oversees every installation.
   lowers NOx, and "designed to" wording only. The owner's position is that the system is a substitute for existing
   emission equipment; the site neither claims nor denies that, and says only that changes to certified emission
   equipment need flag or class approval (agreed 17 Nov 2026).
-- CAD or drawings of the Vajra and ionizer are to come from the owner; until then the 3D model is built from the
-  owner's description and the existing system diagram (`public/assets/img/plasmoid-x-system.svg`).
+- The owner's CAD model of the Vajra (STEP, 17 Nov 2026) set the 3D model's dimensions: 12 in outer spheres, 8 in inner
+  chambers, 4 in sealed cores, centres 426.29 mm apart, 1.65 mm walls, 4 in exhaust ports and 73 mm air ports set
+  off-centre so both flows enter on a tangent. The numbers are at the top of `public/assets/js/vajra.js`; the CAD file
+  itself is not kept in the repository. Flanges, bolts and weld seams on the site's model are not in the CAD. The
+  ionizer has not been drawn yet.
 - No customer names, testimonials or installation photos exist; never invent them.
 
 ## Product Principles

@@ -11,14 +11,21 @@ import { UnrealBloomPass } from "./vendor/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "./vendor/postprocessing/OutputPass.js";
 import { ShaderPass } from "./vendor/postprocessing/ShaderPass.js";
 
-// ---- DIMENSIONS (the outer sphere's radius is 1) ----
-const C = 1.2; // each sphere's centre is this far above / below the middle
-const RO = 1.0, RI = 0.74, RC = 0.36; // outer shell, inner chamber wall, sealed core
-const NECK_O = 0.36, NECK_I = 0.2; // the neck between the spheres: exhaust jacket, air passage
-const T_O = 0.045, T_I = 0.035; // wall thickness: outer shell, inner wall
-const PIPE = 0.2, PORT = 0.21; // air pipe at the poles, exhaust ports on the sides
-const VIEW = THREE.MathUtils.degToRad(24); // where the viewer stands, turned from straight ahead
-const HALF = THREE.MathUtils.degToRad(54); // half the width of the section cut out
+// ---- DIMENSIONS, from the owner's CAD model (Vajra.step, 17 Nov 2026) ----
+// The model is in millimetres; here everything is divided by the outer sphere's radius, 152.4 mm (a 12 inch sphere),
+// so that radius is 1. The CAD's upright axis is this model's y; the side with no pipes faces the viewer.
+const MM = 1 / 152.4;
+const C = 213.145 * MM; // each sphere's centre is this far above / below the middle (centres 426.29 mm apart)
+const RO = 1.0, RI = 101.6 * MM, RC = 50.8 * MM; // outer shell (12 in), inner chamber wall (8 in), sealed core (4 in)
+const NECK_O = 71.65 * MM, NECK_I = 35.0 * MM; // the neck: exhaust jacket outside radius, air passage inside radius
+const T_O = 1.651 * MM, T_I = 1.651 * MM; // wall thickness of both shells: 1.65 mm
+// Exhaust ports: 4 inch pipes along x, set off-centre so the gas enters and leaves on a tangent and swirls.
+const EXH_R = 50.8 * MM, EXH_OFF = 62.87 * MM;
+// Air ports: 73 mm pipes straight out of the back, also off-centre, passing through the exhaust chamber into the inner one.
+const AIR_R = 36.576 * MM, AIR_OFF = 45.8 * MM;
+const STUB = 254 * MM; // every pipe stub ends this far from the centre line
+const VIEW = THREE.MathUtils.degToRad(8); // where the viewer stands, turned from straight ahead
+const HALF = THREE.MathUtils.degToRad(40); // half the width of the section cut out (it sits between the two exhaust ports)
 const BG = 0x0b1c17; // comes out as the page's #050d0a after the lens's tone mapping
 
 const stage = document.getElementById("vajra");
@@ -46,7 +53,7 @@ function start(stage) {
   scene.fog = new THREE.Fog(BG, 10, 20);
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture;
-  scene.environmentIntensity = 1.1;
+  scene.environmentIntensity = 0.8;
   const camera = new THREE.PerspectiveCamera(30, 1, 0.5, 60);
 
   // ---- Textures made here, so nothing has to be downloaded ----
@@ -81,9 +88,9 @@ function start(stage) {
   }, 90, 1);
 
   const shellTex = brushed(1, 5), pipeTex = brushed(1, 14);
-  const steel = new THREE.MeshPhysicalMaterial({ color: 0xd4d9db, metalness: 1, roughness: 0.34, roughnessMap: shellTex, bumpMap: shellTex, bumpScale: 0.35,
+  const steel = new THREE.MeshPhysicalMaterial({ color: 0xb9bfc2, metalness: 1, roughness: 0.3, roughnessMap: shellTex, bumpMap: shellTex, bumpScale: 0.35,
     anisotropy: 0.55, clearcoat: 0.15, clearcoatRoughness: 0.4, side: THREE.DoubleSide });
-  const pipeMat = new THREE.MeshPhysicalMaterial({ color: 0xc9cfd2, metalness: 1, roughness: 0.38, roughnessMap: pipeTex, bumpMap: pipeTex, bumpScale: 0.3, anisotropy: 0.5 });
+  const pipeMat = new THREE.MeshStandardMaterial({ color: 0x9aa1a5, metalness: 1, roughness: 0.42, roughnessMap: pipeTex, envMapIntensity: 0.7 });
   const cutFace = new THREE.MeshStandardMaterial({ color: 0xc2c8cb, metalness: 1, roughness: 0.42, side: THREE.DoubleSide });
   const weld = new THREE.MeshStandardMaterial({ color: 0x8f969a, metalness: 1, roughness: 0.6, bumpMap: bead, bumpScale: 1.6 });
   const boltMat = new THREE.MeshStandardMaterial({ color: 0x9aa1a5, metalness: 1, roughness: 0.3 });
@@ -128,8 +135,8 @@ function start(stage) {
     const face = new THREE.ShapeGeometry(new THREE.Shape([...a, ...b.slice().reverse()]));
     for (const phi of [PHI0, PHI0 + PHI_LEN]) add(face, cutFace).rotation.y = phi - Math.PI / 2;
   }
-  wall(RO, NECK_O, PIPE + 0.03, T_O, steel, liningOuter);
-  wall(RI, NECK_I + T_I, PIPE, T_I, hotWall, liningInner);
+  wall(RO, NECK_O, 0, T_O, steel, liningOuter);
+  wall(RI, NECK_I + T_I, 0, T_I, hotWall, liningInner);
 
   for (const y of [C, -C]) add(new THREE.SphereGeometry(RC, 72, 56), coreMat).position.y = y;
 
@@ -140,58 +147,53 @@ function start(stage) {
     lathe(ring, weld);
   }
   const neckJoin = C - Math.sqrt(RO * RO - NECK_O * NECK_O);
-  seam(RO, C); seam(RO, -C); seam(NECK_O + 0.012, neckJoin, 0.02); seam(NECK_O + 0.012, -neckJoin, 0.02);
+  seam(RO, C, 0.012); seam(RO, -C, 0.012); seam(NECK_O + 0.008, neckJoin, 0.014); seam(NECK_O + 0.008, -neckJoin, 0.014);
 
-  // Pipes, and bolted flanges where they join the unit.
-  function pipe(points, r) {
-    const curve = new THREE.CatmullRomCurve3(points.map((p) => new THREE.Vector3(...p)), false, "catmullrom", 0.35);
-    add(new THREE.TubeGeometry(curve, 110, r, 36), pipeMat);
-  }
+  // Pipe stubs as drawn, each ending in a bolted flange (the flanges, bolts and welds are not in the CAD model).
   const UP = new THREE.Vector3(0, 1, 0);
+  const pipeInside = new THREE.MeshStandardMaterial({ color: 0x0c1012, metalness: 0.5, roughness: 0.8, envMapIntensity: 0.15, side: THREE.BackSide });
   function flange(pos, dir, r) {
     const g = new THREE.Group();
-    g.position.set(...pos);
-    g.quaternion.setFromUnitVectors(UP, new THREE.Vector3(...dir).normalize());
-    const R = r * 1.62, plate = new THREE.CylinderGeometry(R, R, 0.05, 56);
-    for (const y of [-0.031, 0.031]) { const m = new THREE.Mesh(plate, pipeMat); m.position.y = y; g.add(m); }
-    g.add(new THREE.Mesh(new THREE.CylinderGeometry(R * 0.985, R * 0.985, 0.012, 56), gasket));
-    const head = new THREE.CylinderGeometry(0.034, 0.034, 0.03, 6), shank = new THREE.CylinderGeometry(0.016, 0.016, 0.19, 10);
+    g.position.copy(pos);
+    g.quaternion.setFromUnitVectors(UP, dir);
+    const R = r * 1.5, plate = new THREE.CylinderGeometry(R, R, 0.045, 64);
+    const m = new THREE.Mesh(plate, pipeMat); m.position.y = -0.0225; g.add(m);
+    const head = new THREE.CylinderGeometry(0.03, 0.03, 0.026, 6);
     for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2 + 0.2, x = Math.cos(a) * r * 1.32, z = Math.sin(a) * r * 1.32;
-      for (const y of [-0.071, 0.071]) { const m = new THREE.Mesh(head, boltMat); m.position.set(x, y, z); g.add(m); }
-      const s = new THREE.Mesh(shank, boltMat); s.position.set(x, 0, z); g.add(s);
+      const a = (i / 8) * Math.PI * 2 + 0.2;
+      for (const y of [0.013, -0.058]) { const b = new THREE.Mesh(head, boltMat); b.position.set(Math.cos(a) * r * 1.27, y, Math.sin(a) * r * 1.27); g.add(b); }
     }
     model.add(g);
   }
-  const top = C + RO;
-  pipe([[0, top - 0.3, 0], [0, top + 0.5, 0], [-0.25, top + 1.0, 0], [-1.0, top + 1.25, 0], [-4.2, top + 1.25, 0]], PIPE);
-  flange([0, top + 0.12, 0], [0, 1, 0], PIPE);
-  pipe([[0, -top + 0.3, 0], [0, -top - 0.5, 0], [0.25, -top - 1.0, 0], [1.0, -top - 1.25, 0], [4.2, -top - 1.25, 0]], PIPE);
-  flange([0, -top - 0.12, 0], [0, 1, 0], PIPE);
-  function port(sign) {
-    // sign 1: low on the left (exhaust in). sign -1: high on the right (exhaust out). Both leave towards the back.
-    const dir = new THREE.Vector3(-sign * 0.82, -sign * 0.42, -0.38).normalize();
-    const c = new THREE.Vector3(0, -sign * C, 0);
-    const p = (k) => c.clone().addScaledVector(dir, k).toArray();
-    const end = c.clone().addScaledVector(dir, 2.0).add(new THREE.Vector3(-sign * 3.6, -sign * 0.05, -0.8)).toArray();
-    pipe([p(0.9), p(1.4), p(1.8), end], PORT);
-    flange(p(1.16), dir.toArray(), PORT);
-    // A weld where the port meets the sphere.
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(PORT + 0.012, 0.02, 10, 48), weld);
-    ring.position.set(...p(Math.sqrt(RO * RO - PORT * PORT) + 0.005));
+  // A straight stub from just inside the wall it opens into, out to its flange.
+  function stub(from, to, r, weldAt) {
+    const a = new THREE.Vector3(...from), b = new THREE.Vector3(...to), dir = b.clone().sub(a).normalize(), len = a.distanceTo(b);
+    const g = new THREE.CylinderGeometry(r, r, len, 64, 1, true);
+    for (const mat of [pipeMat, pipeInside]) {
+      const m = add(g, mat);
+      m.position.copy(a).addScaledVector(dir, len / 2);
+      m.quaternion.setFromUnitVectors(UP, dir);
+    }
+    flange(b, dir, r);
+    const ring = add(new THREE.TorusGeometry(r + 0.008, 0.012, 10, 64), weld);
+    ring.position.copy(a).addScaledVector(dir, weldAt);
     ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir);
-    model.add(ring);
   }
-  port(1);
-  port(-1);
+  for (const s of [1, -1]) {
+    // s = 1: the upper sphere. s = -1: the lower one, where everything is mirrored through the centre.
+    const y = s * (C + EXH_OFF), x0 = Math.sqrt(RO * RO - 2 * EXH_OFF * EXH_OFF);
+    stub([-s * (x0 - 0.1), y, EXH_OFF], [-s * STUB, y, EXH_OFF], EXH_R, 0.1 + 0.04); // exhaust: out to the left up top, in from the right below
+    const ya = s * (C + AIR_OFF), z0 = Math.sqrt(RI * RI - 2 * AIR_OFF * AIR_OFF);
+    stub([-s * AIR_OFF, ya, -(z0 - 0.06)], [-s * AIR_OFF, ya, -STUB], AIR_R, 0.06 + Math.sqrt(RO * RO - 2 * AIR_OFF * AIR_OFF) - z0 + 0.02); // air: in and out at the back
+  }
 
   // Light: a studio around it, plus the colour each flow throws on the steel near it.
-  const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(3, 5, 6);
-  const rim = new THREE.DirectionalLight(0x9fd6ff, 2.6); rim.position.set(-6, 2, -3);
-  const fill = new THREE.DirectionalLight(0xffffff, 0.8); fill.position.set(-4, -1, 5);
+  const key = new THREE.DirectionalLight(0xffffff, 1.3); key.position.set(3, 5, 6);
+  const rim = new THREE.DirectionalLight(0x9fd6ff, 2.0); rim.position.set(-6, 2, -3);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.35); fill.position.set(-4, -1, 5);
   scene.add(key, rim, fill);
-  const warm = new THREE.PointLight(0xff6a2a, 2.0, 3.0, 2); warm.position.set(0.75, -C, 0.75);
-  const cold = new THREE.PointLight(0x5fb8ff, 1.4, 2.4, 2); cold.position.set(0.3, C + 0.1, 0.45);
+  const warm = new THREE.PointLight(0xff6a2a, 1.5, 1.7, 2); warm.position.set(0.1, -C + 0.1, 0.6);
+  const cold = new THREE.PointLight(0x5fb8ff, 1.2, 1.6, 2); cold.position.set(0.1, C + 0.1, 0.5);
   model.add(warm, cold);
 
   // ---- The two flows. Each is thousands of soft points whose path is worked out on the graphics card: long
@@ -207,13 +209,12 @@ function start(stage) {
       float t = fract(aSeed * 13.7 + uTime * aSpeed) - aTrail * uTrail;
       float fade = smoothstep(0.0, 0.06, t) * smoothstep(1.0, 0.93, t);
       t = clamp(t, 0.0, 1.0);
-      float span = uKind < 0.5 ? C + RIN + 0.3 : C + RO * 0.84;
+      float span = uKind < 0.5 ? C + RIN * 0.86 : C + RO * 0.86;
       float y = uKind < 0.5 ? mix(span, -span, t) : mix(-span, span, t); // air goes down, exhaust comes up
       float r;
       if (uKind < 0.5) {
         float core = ring(RC, y), wallIn = max(ring(RIN, y), NECK_I);
         r = mix(core + 0.04, max(wallIn - 0.045, core + 0.045), aLane);
-        if (abs(y) > C + RIN - 0.03) r = min(r, ${(PIPE - 0.05).toFixed(3)});
       } else {
         float wallOut = max(ring(RI, y), NECK_W), shell = max(ring(RO, y), NECK_O);
         r = mix(wallOut + 0.04, max(shell - 0.04, wallOut + 0.045), aLane);
@@ -222,7 +223,7 @@ function start(stage) {
       r += 0.014 * sin(t * 61.0 + aSeed * 40.0 + uTime * 0.9) * smoothstep(0.1, 0.3, r);
       float turns = uKind < 0.5 ? 9.0 : 7.0;
       // The swirl tightens where the chamber narrows, like a tornado.
-      float a = aSeed * 6.2832 * 5.0 + (uKind < 0.5 ? 1.0 : -1.0) * (t * turns * 6.2832 + 1.4 / (r + 0.25)) + 0.1 * sin(t * 23.0 + aSeed * 17.0);
+      float a = aSeed * 6.2832 * 5.0 + (uKind < 0.5 ? -1.0 : 1.0) * (t * turns * 6.2832 + 1.4 / (r + 0.25)) + 0.1 * sin(t * 23.0 + aSeed * 17.0);
       vec4 mv = modelViewMatrix * vec4(r * cos(a), y, r * sin(a), 1.0);
       gl_Position = projectionMatrix * mv;
       gl_PointSize = min(uSize * uScale * (1.0 - aTrail * 0.55) / -mv.z, 96.0);
@@ -314,11 +315,11 @@ function start(stage) {
 
   // ---- Labels: fixed points on the model, placed over the canvas each frame ----
   const at = (a) => new THREE.Vector3(Math.sin(a), 0, Math.cos(a));
-  const toViewer = at(VIEW + THREE.MathUtils.degToRad(30));
+  const toViewer = at(VIEW + THREE.MathUtils.degToRad(18));
   const anchors = {
-    air: toViewer.clone().multiplyScalar(0.53).add(new THREE.Vector3(0, C + 0.28, 0)),
+    air: toViewer.clone().multiplyScalar(0.5).add(new THREE.Vector3(0, C + 0.3, 0)),
     core: toViewer.clone().multiplyScalar(RC).add(new THREE.Vector3(0, C - 0.1, 0)),
-    exhaust: toViewer.clone().multiplyScalar(0.84).add(new THREE.Vector3(0, -C - 0.05, 0)),
+    exhaust: toViewer.clone().multiplyScalar(0.83).add(new THREE.Vector3(0, -C + 0.42, 0)),
   };
   const labels = [...stage.querySelectorAll("[data-anchor]")].map((el) => ({ el, at: anchors[el.dataset.anchor] })).filter((l) => l.at);
   const v = new THREE.Vector3(), edge = new THREE.Vector3(), right = new THREE.Vector3();
@@ -328,7 +329,7 @@ function start(stage) {
       v.copy(l.at).applyMatrix4(model.matrixWorld).project(camera);
       const x = ((v.x + 1) / 2) * w, y = ((1 - v.y) / 2) * h;
       // The line runs from the point to just clear of the unit's right-hand edge.
-      edge.set(0, l.at.y, 0).addScaledVector(right, RO * 1.08).project(camera);
+      edge.set(0, l.at.y, 0).addScaledVector(right, RO * 1.1).project(camera);
       l.el.style.transform = `translate(${x}px, ${y}px)`;
       l.el.style.setProperty("--lead", `${Math.max(24, ((edge.x + 1) / 2) * w - x + 18)}px`);
     }
@@ -348,7 +349,7 @@ function start(stage) {
     camera.aspect = w / h;
     // Keep both spheres in view whatever the shape of the stage; the pipes run off the edges.
     const tan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    dist = Math.max(2.95 / tan, 2.05 / (tan * camera.aspect));
+    dist = Math.max(2.75 / tan, 2.15 / (tan * camera.aspect));
     scene.fog.near = dist + 0.6; scene.fog.far = dist + 6.5;
     bokeh.uniforms.focus.value = dist;
     bokeh.uniforms.aspect.value = camera.aspect;
@@ -365,13 +366,13 @@ function start(stage) {
     const e = 1 - Math.pow(1 - intro, 4);
     const d = dist * (1.22 - 0.22 * e);
     camera.position.set(d * Math.sin(VIEW) * 0.985, d * 0.17, d * Math.cos(VIEW) * 0.985);
-    camera.lookAt(0.25, 0, 0);
+    camera.lookAt(0.34, 0, 0);
     camera.updateProjectionMatrix();
     heat.value = time;
     const lit = Math.max(0, (e - 0.35) / 0.65);
     for (const m of flows) { m.uniforms.uTime.value = time; m.uniforms.uOpacity.value = m.userData.opacity * lit; }
     hotWall.emissiveIntensity = lit;
-    warm.intensity = 2.0 * lit; cold.intensity = 1.4 * lit;
+    warm.intensity = 1.5 * lit; cold.intensity = 1.2 * lit;
     model.rotation.y = px * 0.5 + Math.sin(time * 0.22) * (reduce ? 0 : 0.05) - (1 - e) * 0.55;
     model.rotation.x = py * 0.16;
     model.updateMatrixWorld();
