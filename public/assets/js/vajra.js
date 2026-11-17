@@ -180,26 +180,50 @@ function start(stage) {
     }
     model.add(g);
   }
-  // A straight stub from just inside the wall it opens into, out to its flange.
-  function stub(from, to, r, weldAt) {
-    const a = new THREE.Vector3(...from), b = new THREE.Vector3(...to), dir = b.clone().sub(a).normalize(), len = a.distanceTo(b);
-    const g = new THREE.CylinderGeometry(r, r, len, 64, 1, true);
-    for (const mat of [pipeMat, pipeInside]) {
-      const m = add(g, mat);
-      m.position.copy(a).addScaledVector(dir, len / 2);
-      m.quaternion.setFromUnitVectors(UP, dir);
+  // A pipe stub trimmed to the sphere it joins. The pipes sit off-centre, so the joint is not a flat circle: each
+  // line along the pipe starts where it meets the sphere, and the weld follows that same curve.
+  //   centre: the sphere's centre.  axis: the way the pipe runs.  off: from the sphere's centre to the pipe's centre line.
+  //   opensAt: the radius of the sphere the pipe opens into.  weldAt: the radius of the shell it is welded to.
+  function stub(centre, axis, off, r, opensAt, weldAt) {
+    const N = 96;
+    const u = new THREE.Vector3().crossVectors(axis, Math.abs(axis.y) < 0.9 ? UP : new THREE.Vector3(1, 0, 0)).normalize();
+    const v = new THREE.Vector3().crossVectors(axis, u);
+    const pos = [], nor = [], uv = [], idx = [], seamPts = [];
+    const radial = new THREE.Vector3(), q = new THREE.Vector3(), p = new THREE.Vector3();
+    for (let i = 0; i <= N; i++) {
+      const a = (i / N) * Math.PI * 2;
+      radial.copy(u).multiplyScalar(Math.cos(a)).addScaledVector(v, Math.sin(a));
+      q.copy(off).addScaledVector(radial, r); // this line's position across the pipe, measured from the sphere's centre
+      const d2 = q.lengthSq();
+      const start = Math.sqrt(Math.max(opensAt * opensAt - d2, 0)), end = STUB - off.dot(axis);
+      for (const [t, w] of [[start, 0], [end, 1]]) {
+        p.copy(centre).add(q).addScaledVector(axis, t);
+        pos.push(p.x, p.y, p.z); nor.push(radial.x, radial.y, radial.z); uv.push(i / N, w);
+      }
+      if (i < N) {
+        const k = i * 2;
+        idx.push(k, k + 2, k + 1, k + 2, k + 3, k + 1);
+        const tw = Math.sqrt(Math.max(weldAt * weldAt - q.copy(off).addScaledVector(radial, r + 0.006).lengthSq(), 0));
+        seamPts.push(new THREE.Vector3().copy(centre).add(q).addScaledVector(axis, tw));
+      }
     }
-    flange(b, dir, r);
-    const ring = add(new THREE.TorusGeometry(r + 0.008, 0.012, 10, 64), weld);
-    ring.position.copy(a).addScaledVector(dir, weldAt);
-    ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir);
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3));
+    g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+    g.setIndex(idx);
+    add(g, pipeMat);
+    add(g, pipeInside);
+    add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(seamPts, true), 160, 0.011, 8, true), weld);
+    flange(new THREE.Vector3().copy(centre).add(off).addScaledVector(axis, STUB - off.dot(axis)), axis, r);
   }
   for (const s of [1, -1]) {
-    // s = 1: the upper sphere. s = -1: the lower one, where everything is mirrored through the centre.
-    const y = s * (C + EXH_OFF), x0 = Math.sqrt(RO * RO - 2 * EXH_OFF * EXH_OFF);
-    stub([-s * (x0 - 0.1), y, EXH_OFF], [-s * STUB, y, EXH_OFF], EXH_R, 0.1 + 0.04); // exhaust: out to the left up top, in from the right below
-    const ya = s * (C + AIR_OFF), z0 = Math.sqrt(RI * RI - 2 * AIR_OFF * AIR_OFF);
-    stub([-s * AIR_OFF, ya, -(z0 - 0.06)], [-s * AIR_OFF, ya, -STUB], AIR_R, 0.06 + Math.sqrt(RO * RO - 2 * AIR_OFF * AIR_OFF) - z0 + 0.02); // air: in and out at the back
+    // s = 1: the upper sphere. s = -1: the lower one, which is the upper one turned half a turn about the front-to-back axis.
+    const centre = new THREE.Vector3(0, s * C, 0);
+    // Exhaust: out to the left up top, in from the right below. It opens into the outer chamber.
+    stub(centre, new THREE.Vector3(-s, 0, 0), new THREE.Vector3(0, s * EXH_OFF, EXH_OFF), EXH_R, RO - 0.004, RO);
+    // Air: in and out at the back. It passes through the exhaust chamber and opens into the inner one.
+    stub(centre, new THREE.Vector3(0, 0, -1), new THREE.Vector3(-s * AIR_OFF, s * AIR_OFF, 0), AIR_R, RI - 0.004, RO);
   }
 
   // Light: a studio around it, plus the colour each flow throws on the steel near it.
