@@ -3,10 +3,8 @@
 // the other way and warms it through the wall. Built from the owner's description of the system, not from CAD:
 // every size is in DIMENSIONS below, so a drawing only has to change those numbers.
 import * as THREE from "three";
-import { RoomEnvironment } from "./vendor/RoomEnvironment.js";
 import { EffectComposer } from "./vendor/postprocessing/EffectComposer.js";
 import { RenderPass } from "./vendor/postprocessing/RenderPass.js";
-import { BokehPass } from "./vendor/postprocessing/BokehPass.js";
 import { UnrealBloomPass } from "./vendor/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "./vendor/postprocessing/OutputPass.js";
 import { ShaderPass } from "./vendor/postprocessing/ShaderPass.js";
@@ -42,18 +40,34 @@ function start(stage) {
   }
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const small = matchMedia("(max-width: 900px)").matches;
-  let pixelRatio = Math.min(devicePixelRatio || 1, small ? 1.5 : 2);
+  // Drawn at least one and a half times the screen's own resolution, so edges are smooth on ordinary monitors too.
+  let pixelRatio = Math.min(Math.max(devicePixelRatio || 1, 1.5), 2);
   renderer.setPixelRatio(pixelRatio);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.0;
+  renderer.toneMappingExposure = 0.92;
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(BG);
   scene.fog = new THREE.Fog(BG, 10, 20);
   const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture;
-  scene.environmentIntensity = 0.8;
+  // What the steel reflects: a dark studio with a few soft lights, as a product photographer would set it up.
+  // Polished metal only looks like metal when it has dark to reflect as well as light.
+  const studio = new THREE.Scene();
+  studio.background = new THREE.Color(0x04070a);
+  const softbox = (w, h, color, power, pos) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(power), side: THREE.DoubleSide }));
+    m.position.set(...pos);
+    m.lookAt(0, 0, 0);
+    studio.add(m);
+  };
+  softbox(9, 5, 0xffffff, 7, [3, 9, 7]); // the main light, high and in front
+  softbox(2.5, 13, 0xcfe6ff, 6, [-10, 1, 3]); // a tall cool strip on the left
+  softbox(2, 10, 0xffffff, 3.5, [10, 0, -3]); // a strip behind on the right, for the edge
+  softbox(14, 3, 0xffd9b8, 1.0, [0, -9, 5]); // a low warm bounce from below
+  softbox(9, 9, 0x7fa3b5, 0.35, [0, 2, -11]); // a dim backdrop, so the far side is not pure black
+  scene.environment = pmrem.fromScene(studio, 0.02).texture;
+  scene.environmentIntensity = 1.3;
   const camera = new THREE.PerspectiveCamera(30, 1, 0.5, 60);
 
   // ---- Textures made here, so nothing has to be downloaded ----
@@ -88,27 +102,26 @@ function start(stage) {
   }, 90, 1);
 
   const shellTex = brushed(1, 5), pipeTex = brushed(1, 14);
-  const steel = new THREE.MeshPhysicalMaterial({ color: 0xb9bfc2, metalness: 1, roughness: 0.3, roughnessMap: shellTex, bumpMap: shellTex, bumpScale: 0.35,
-    anisotropy: 0.55, clearcoat: 0.15, clearcoatRoughness: 0.4, side: THREE.DoubleSide });
-  const pipeMat = new THREE.MeshStandardMaterial({ color: 0x9aa1a5, metalness: 1, roughness: 0.42, roughnessMap: pipeTex, envMapIntensity: 0.7 });
+  const steel = new THREE.MeshStandardMaterial({ color: 0xc6ccd0, metalness: 1, roughness: 0.42, roughnessMap: shellTex, side: THREE.DoubleSide });
+  const pipeMat = new THREE.MeshStandardMaterial({ color: 0xb4babd, metalness: 1, roughness: 0.5, roughnessMap: pipeTex });
   const cutFace = new THREE.MeshStandardMaterial({ color: 0xc2c8cb, metalness: 1, roughness: 0.42, side: THREE.DoubleSide });
   const weld = new THREE.MeshStandardMaterial({ color: 0x8f969a, metalness: 1, roughness: 0.6, bumpMap: bead, bumpScale: 1.6 });
   const boltMat = new THREE.MeshStandardMaterial({ color: 0x9aa1a5, metalness: 1, roughness: 0.3 });
   const gasket = new THREE.MeshStandardMaterial({ color: 0x15191b, metalness: 0.2, roughness: 0.9 });
-  const coreMat = new THREE.MeshPhysicalMaterial({ color: 0xe9edef, metalness: 1, roughness: 0.06 });
+  const coreMat = new THREE.MeshStandardMaterial({ color: 0xe9edef, metalness: 1, roughness: 0.24 });
   // Inside the chambers the steel is dark and heat-stained, so the two flows read against it.
   const liningOuter = new THREE.MeshStandardMaterial({ color: 0x14181a, metalness: 0.6, roughness: 0.7, envMapIntensity: 0.2, side: THREE.DoubleSide });
   const liningInner = new THREE.MeshStandardMaterial({ color: 0x10171c, metalness: 0.6, roughness: 0.65, envMapIntensity: 0.2, side: THREE.DoubleSide });
   // The wall between the two flows glows where the exhaust heats it: hottest low down, where the exhaust comes in.
   const heat = { value: 0 };
-  const hotWall = new THREE.MeshStandardMaterial({ color: 0x1d1512, metalness: 0.7, roughness: 0.55, envMapIntensity: 0.25, emissive: 0xff5a14, emissiveIntensity: 1, side: THREE.DoubleSide });
+  const hotWall = new THREE.MeshStandardMaterial({ color: 0x120c0a, metalness: 0.7, roughness: 0.55, envMapIntensity: 0.25, emissive: 0xff4208, emissiveIntensity: 1, side: THREE.DoubleSide });
   hotWall.onBeforeCompile = (sh) => {
     sh.uniforms.uHeatTime = heat;
     sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nvarying float vHeatY;").replace("#include <begin_vertex>", "#include <begin_vertex>\nvHeatY = position.y;");
     sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nvarying float vHeatY; uniform float uHeatTime;")
       .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>
         float hy = (vHeatY + ${(C + RI).toFixed(2)}) / ${(2 * (C + RI)).toFixed(2)};
-        float glow = mix(0.5, 0.1, smoothstep(0.0, 1.0, hy));
+        float glow = mix(0.3, 0.05, smoothstep(0.0, 1.0, hy));
         glow *= 0.72 + 0.28 * sin(hy * 26.0 - uHeatTime * 1.6);
         totalEmissiveRadiance *= glow;`);
   };
@@ -135,8 +148,10 @@ function start(stage) {
     const face = new THREE.ShapeGeometry(new THREE.Shape([...a, ...b.slice().reverse()]));
     for (const phi of [PHI0, PHI0 + PHI_LEN]) add(face, cutFace).rotation.y = phi - Math.PI / 2;
   }
-  wall(RO, NECK_O, 0, T_O, steel, liningOuter);
-  wall(RI, NECK_I + T_I, 0, T_I, hotWall, liningInner);
+  // The real walls are 1.65 mm: a hairline at this size. They are drawn at about 2.7 mm so the cut edge can be seen.
+  const SHOWN = 0.018;
+  wall(RO, NECK_O, 0, Math.max(T_O, SHOWN), steel, liningOuter);
+  wall(RI, NECK_I + T_I, 0, Math.max(T_I, SHOWN), hotWall, liningInner);
 
   for (const y of [C, -C]) add(new THREE.SphereGeometry(RC, 72, 56), coreMat).position.y = y;
 
@@ -188,9 +203,9 @@ function start(stage) {
   }
 
   // Light: a studio around it, plus the colour each flow throws on the steel near it.
-  const key = new THREE.DirectionalLight(0xffffff, 1.3); key.position.set(3, 5, 6);
-  const rim = new THREE.DirectionalLight(0x9fd6ff, 2.0); rim.position.set(-6, 2, -3);
-  const fill = new THREE.DirectionalLight(0xffffff, 0.35); fill.position.set(-4, -1, 5);
+  const key = new THREE.DirectionalLight(0xffffff, 0.7); key.position.set(3, 5, 6);
+  const rim = new THREE.DirectionalLight(0x9fd6ff, 1.1); rim.position.set(-6, 2, -3);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.15); fill.position.set(-4, -1, 5);
   scene.add(key, rim, fill);
   const warm = new THREE.PointLight(0xff6a2a, 1.5, 1.7, 2); warm.position.set(0.1, -C + 0.1, 0.6);
   const cold = new THREE.PointLight(0x5fb8ff, 1.2, 1.6, 2); cold.position.set(0.1, C + 0.1, 0.5);
@@ -267,26 +282,24 @@ function start(stage) {
   }
   const few = small ? 0.6 : 1;
   // Streamlines
-  flow({ kind: 0, streaks: Math.round(95 * few), trail: 150, length: 0.1, a: 0xb4e6ff, b: 0x2f8cff, size: 4.8, opacity: 0.24, speed: 0.05, soft: 1.6 });
-  flow({ kind: 1, streaks: Math.round(150 * few), trail: 150, length: 0.1, a: 0xffcf7a, b: 0xff4a1c, size: 5.2, opacity: 0.19, speed: 0.04, soft: 1.6 });
+  flow({ kind: 0, streaks: Math.round(170 * few), trail: 200, length: 0.07, a: 0xb4e6ff, b: 0x2f8cff, size: 3.0, opacity: 0.22, speed: 0.05, soft: 1.3 });
+  flow({ kind: 1, streaks: Math.round(260 * few), trail: 200, length: 0.07, a: 0xffcf7a, b: 0xff4a1c, size: 3.2, opacity: 0.18, speed: 0.04, soft: 1.3 });
   // Body
-  flow({ kind: 0, streaks: Math.round(420 * few), trail: 1, length: 0, a: 0x7fc8ff, b: 0x2a6fe0, size: 30, opacity: 0.034, speed: 0.045, soft: 2.2 });
-  flow({ kind: 1, streaks: Math.round(620 * few), trail: 1, length: 0, a: 0xff9a45, b: 0xe23a10, size: 30, opacity: 0.03, speed: 0.036, soft: 2.2 });
+  flow({ kind: 0, streaks: Math.round(300 * few), trail: 1, length: 0, a: 0x7fc8ff, b: 0x2a6fe0, size: 26, opacity: 0.022, speed: 0.045, soft: 2.2 });
+  flow({ kind: 1, streaks: Math.round(440 * few), trail: 1, length: 0, a: 0xff9a45, b: 0xe23a10, size: 26, opacity: 0.02, speed: 0.036, soft: 2.2 });
 
-  // ---- Lens: a little depth of field, and bloom on what glows ----
+  // ---- Lens: smooth edges, and bloom on what glows ----
   // Only the two flows and the hot wall bloom. They are drawn once on their own, with the steel turned black so it
   // still hides what is behind it, blurred, and added over the finished picture.
   const glowComposer = new EffectComposer(renderer);
   glowComposer.renderToScreen = false;
   glowComposer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.42, 0.3, 0.0);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.55, 0.32, 0.0);
   glowComposer.addPass(bloom);
 
-  const composer = new EffectComposer(renderer);
+  // The picture is drawn with four samples a pixel, which is what smooths the edges.
+  const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
   composer.addPass(new RenderPass(scene, camera));
-  const bokeh = new BokehPass(scene, camera, { focus: 10, aperture: 0.00016, maxblur: 0.006 });
-  bokeh.enabled = !small;
-  composer.addPass(bokeh);
   const addGlow = new ShaderPass(new THREE.ShaderMaterial({
     uniforms: { tDiffuse: { value: null }, tGlow: { value: glowComposer.renderTarget2.texture } },
     vertexShader: "varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
@@ -294,6 +307,12 @@ function start(stage) {
   }), "tDiffuse");
   composer.addPass(addGlow);
   composer.addPass(new OutputPass());
+  // A grain too fine to see, which stops the dark background showing bands.
+  composer.addPass(new ShaderPass(new THREE.ShaderMaterial({
+    uniforms: { tDiffuse: { value: null } },
+    vertexShader: "varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+    fragmentShader: "uniform sampler2D tDiffuse; varying vec2 vUv; float h(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); } void main() { vec4 c = texture2D(tDiffuse, vUv); gl_FragColor = vec4(c.rgb + (h(gl_FragCoord.xy) - 0.5) / 255.0, c.a); }",
+  }), "tDiffuse"));
   const black = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide, fog: false });
   const blackBg = new THREE.Color(0x000000), realBg = scene.background;
   const dulled = [];
@@ -308,10 +327,9 @@ function start(stage) {
     for (const o of body) o.visible = true;
     for (const o of dulled) o.material = o.userData.keep;
   }
-  // For tuning: ?bloom=0 or ?dof=0 in the address switches an effect off.
+  // For tuning: ?bloom=0 in the address switches the glow off; ?still=1 skips the reveal.
   const q = new URLSearchParams(location.search);
   if (q.get("bloom") === "0") { bloom.enabled = false; addGlow.enabled = false; }
-  if (q.get("dof") === "0") bokeh.enabled = false;
 
   // ---- Labels: fixed points on the model, placed over the canvas each frame ----
   const at = (a) => new THREE.Vector3(Math.sin(a), 0, Math.cos(a));
@@ -351,8 +369,6 @@ function start(stage) {
     const tan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     dist = Math.max(2.75 / tan, 2.15 / (tan * camera.aspect));
     scene.fog.near = dist + 0.6; scene.fog.far = dist + 6.5;
-    bokeh.uniforms.focus.value = dist;
-    bokeh.uniforms.aspect.value = camera.aspect;
     for (const m of flows) m.uniforms.uScale.value = h * pixelRatio * 0.012;
     draw();
   }
@@ -382,18 +398,20 @@ function start(stage) {
     if (!shown && (intro > 0.45 || reduce)) { shown = true; stage.classList.add("is-live"); }
   }
 
-  // If the device struggles, give up the lens effects before giving up smoothness.
-  let frames = 0, spent = 0, step = 0;
-  function tune(dt) {
-    if (step > 2 || (frames += 1) < 20) return;
-    spent += dt;
-    if (frames < 80) return;
-    const avg = spent / 60;
-    frames = 0; spent = 0;
-    if (avg < 0.03) { step = 9; return; }
+  // If the device really struggles (under about 24 frames a second), give up resolution a step at a time, and the
+  // glow last. A device that keeps up is left alone.
+  let frames = 0, since = 0, step = 0;
+  function tune() {
+    if (step > 2) return;
+    const now = performance.now();
+    if ((frames += 1) === 30) since = now; // let the first frames (shaders compiling, the reveal) go by
+    if (frames < 120) return;
+    const avg = (now - since) / 90;
+    frames = 0;
+    if (avg < 42) { step = 9; return; }
     step += 1;
-    if (step === 1) bokeh.enabled = false;
-    else if (step === 2) { pixelRatio = Math.min(pixelRatio, 1); resize(); }
+    if (step === 1) { pixelRatio = Math.max(1.25, pixelRatio - 0.5); resize(); }
+    else if (step === 2) { pixelRatio = 1; resize(); }
     else { bloom.enabled = false; addGlow.enabled = false; }
   }
 
@@ -406,7 +424,7 @@ function start(stage) {
     intro = Math.min(1, intro + dt / 2.8);
     px += (tx - px) * 0.05; py += (ty - py) * 0.05;
     draw();
-    tune(dt);
+    tune();
     raf = requestAnimationFrame(frame);
   }
   const kick = () => { if (!reduce && !raf) { clock.getDelta(); raf = requestAnimationFrame(frame); } };
