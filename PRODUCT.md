@@ -18,6 +18,10 @@ instead of cleaning the exhaust after it. The site's job is to make that idea un
 (the enquiry form). Success = a qualified enquiry.
 
 ## Positioning
+The point of the system is cleaner exhaust (owner, 17 Nov 2026): copy and drawings lead with that, not with
+temperature or heat exchange. In drawings the exhaust enters the Vajra dense and orange and leaves pale and thin.
+The words stay "designed to" until a diesel result with a baseline exists.
+
 Every other system (SCR, diesel particulate filters) works on the exhaust after combustion. Plasmoid X works on the air
 going in: no filter media to clog, no chemicals to dose, and it connects to the exhaust runs the vessel already has.
 
@@ -46,8 +50,9 @@ the complete retrofit; Plasmoid X oversees every installation.
   filtered intake and the exhaust outlet.
 - Pages stay clean and easy to read; no section may take over scrolling. The live "follow the air" player is on the
   Technology page and plays once, then stops (owner, 17 Nov 2026).
-- The founder is described as an engineer, not a "yacht engineer"; he has a long interest in plasma physics and
-  believes it is at the start of a new age.
+- The founder is described as an engineer, not a "yacht engineer": for 13 years he was the engineer on yachts,
+  responsible for all of the vessel's engineering, not only its engines. He has a long interest in plasma physics
+  and believes it is at the start of a new age.
 - Never use "aboard": "on board", two words.
 - No "trial", "in development" or "unfinished" wording (owner).
 - Claims stay as "designed to" until measured figures are supplied.

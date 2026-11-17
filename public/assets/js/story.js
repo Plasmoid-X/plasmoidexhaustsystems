@@ -137,7 +137,7 @@ function start() {
     });
   }
   const few = small ? 0.6 : 1;
-  const AIR = 0xdfeefc, IONIZED = 0xb18cff, PLASMOID = 0x7fc4ff, WARMED = 0x9fb6ff, HOT = 0xff6a24, COOLED = 0xd99a6a;
+  const AIR = 0xdfeefc, IONIZED = 0xb18cff, PLASMOID = 0x7fc4ff, WARMED = 0x9fb6ff, HOT = 0xff5a1a, CLEAN = 0xdfeaf0;
 
   // ---- 2. The bubbler: a sealed, clear column of water. Air comes down a dip tube and bubbles up through it. ----
   const ION = V(-3.9, -2.9, -2.3), ION_R = 0.82, ION_H = 3.3, WATER = ION_H * 0.52;
@@ -279,11 +279,11 @@ function start() {
   // 4. Hot exhaust from the turbine up into the Vajra's lower exhaust port.
   const fromEngine = run([[TURBO.x, TURBO.y + 0.55, TURB_Z], [TURBO.x, -yExh, TURB_Z], [STUB, -yExh, TURB_Z]], 0.5);
   pipe(fromEngine, EXH_R, { start: null, end: "flange" });
-  stream(fromEngine, EXH_R * 0.9, { color: HOT, count: Math.round(40 * few), trail: 26, gap: 0.006, size: 3.4, opacity: 0.3, speed: 0.11, turns: 3 });
-  // 6. Cooler exhaust from the upper exhaust port, away and out of the boat.
+  stream(fromEngine, EXH_R * 0.9, { color: HOT, count: Math.round(52 * few), trail: 26, gap: 0.006, size: 3.6, opacity: 0.36, speed: 0.11, turns: 3 });
+  // 6. The exhaust from the upper exhaust port, away and out of the boat: drawn pale and thin beside what came in.
   const out = run([[-STUB, yExh, EXH_OFF], [-3.0, yExh, EXH_OFF], [-3.0, 11, EXH_OFF]], 0.6);
   pipe(out, EXH_R, { to: 0.9, start: "flange" });
-  stream(out, EXH_R * 0.9, { color: COOLED, count: Math.round(40 * few), trail: 26, gap: 0.005, size: 3.4, opacity: 0.2, speed: 0.07, turns: 3, fadeOut: 0.3 });
+  stream(out, EXH_R * 0.9, { color: CLEAN, count: Math.round(26 * few), trail: 26, gap: 0.005, size: 3.0, opacity: 0.14, speed: 0.07, turns: 3, fadeOut: 0.3 });
 
   const lens = createLens(S);
 
@@ -309,7 +309,7 @@ function start() {
     { pos: [-7.9, 2.6, 5.6], look: [-7.45, 1.15, -2.3], air: 1, exh: 0.5 }, // 1 the UV ionizer
     { pos: [-1.9, 0.5, 5.6], look: [-3.9, -1.0, -2.3], air: 1, exh: 0.5 }, // 2 the bubbler
     { pos: [2.6, 2.6, 8.8], look: [0.55, 0.7, 0], air: 1.25, exh: 0.3 }, // 3 the Vajra: the air's spiral
-    { pos: [2.0, -1.6, 7.6], look: [0, -0.75, 0], air: 0.45, exh: 1.35 }, // 4 heat exchange: the exhaust's spiral
+    { pos: [2.0, -1.6, 7.6], look: [0, -0.75, 0], air: 0.45, exh: 1.35 }, // 4 counter-flow: the exhaust's spiral
     { pos: [6.6, 0.7, 8.4], look: [3.6, -2.6, -0.6], air: 1, exh: 0.8 }, // 5 into the engine
     { pos: [-2.0, 4.2, 12.5], look: [-1.3, 3.1, 0.3], air: 0.5, exh: 1.2 }, // 6 exhaust out
   ].map((s) => ({ pos: V(...s.pos), look: V(...s.look), air: s.air, exh: s.exh, slide: poster ? 0 : s.slide ?? 0.22 }));

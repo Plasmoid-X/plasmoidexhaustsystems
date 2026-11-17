@@ -107,7 +107,8 @@ export function createStage(canvas) {
   // Inside the chambers the steel is dark and heat-stained, so the two flows read against it.
   const liningOuter = new THREE.MeshStandardMaterial({ color: 0x14181a, metalness: 0.6, roughness: 0.7, envMapIntensity: 0.2, side: THREE.DoubleSide });
   const liningInner = new THREE.MeshStandardMaterial({ color: 0x10171c, metalness: 0.6, roughness: 0.65, envMapIntensity: 0.2, side: THREE.DoubleSide });
-  // The wall between the two flows glows where the exhaust heats it: hottest low down, where the exhaust comes in.
+  // The wall between the two flows glows a little where the exhaust first meets it, low down. Kept faint: the story
+  // is the exhaust being cleaned, not the heat.
   const heat = { value: 0 };
   const hotWall = new THREE.MeshStandardMaterial({ color: 0x120c0a, metalness: 0.7, roughness: 0.55, envMapIntensity: 0.25, emissive: 0xff4208, emissiveIntensity: 1, side: THREE.DoubleSide });
   hotWall.onBeforeCompile = (sh) => {
@@ -116,7 +117,7 @@ export function createStage(canvas) {
     sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nvarying float vHeatY; uniform float uHeatTime;")
       .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>
         float hy = (vHeatY + ${(C + RI).toFixed(2)}) / ${(2 * (C + RI)).toFixed(2)};
-        float glow = mix(0.3, 0.05, smoothstep(0.0, 1.0, hy));
+        float glow = mix(0.13, 0.02, smoothstep(0.0, 1.0, hy));
         glow *= 0.72 + 0.28 * sin(hy * 26.0 - uHeatTime * 1.6);
         totalEmissiveRadiance *= glow;`);
   };
@@ -245,7 +246,7 @@ export function buildVajra(S) {
   const flowVertex = /* glsl */ `
     attribute float aSeed; attribute float aLane; attribute float aSpeed; attribute float aTrail;
     uniform float uTime, uKind, uSize, uScale, uTrail;
-    varying float vAlpha; varying float vLane;
+    varying float vAlpha; varying float vLane; varying float vAlong;
     const float C = ${C.toFixed(3)}, RO = ${(RO - T_O).toFixed(3)}, RI = ${RI.toFixed(3)}, RIN = ${(RI - T_I).toFixed(3)}, RC = ${RC.toFixed(3)};
     const float NECK_O = ${(NECK_O - T_O).toFixed(3)}, NECK_W = ${(NECK_I + T_I).toFixed(3)}, NECK_I = ${NECK_I.toFixed(3)};
     float ring(float r, float y) { float d = min(abs(y - C), abs(y + C)); return sqrt(max(r * r - d * d, 0.0)); }
@@ -273,14 +274,17 @@ export function buildVajra(S) {
       gl_PointSize = min(uSize * uScale * (1.0 - aTrail * 0.55) / -mv.z, 96.0);
       vAlpha = fade * pow(1.0 - aTrail, 1.3);
       vLane = aLane;
+      vAlong = uKind < 0.5 ? 0.0 : t; // how far the exhaust has come through the unit
     }`;
   const flowFragment = /* glsl */ `
-    uniform vec3 uColorA, uColorB; uniform float uOpacity, uSoft;
-    varying float vAlpha; varying float vLane;
+    uniform vec3 uColorA, uColorB, uClean; uniform float uOpacity, uSoft;
+    varying float vAlpha; varying float vLane; varying float vAlong;
     void main() {
       float d = length(gl_PointCoord - 0.5) * 2.0;
       float a = pow(max(1.0 - d, 0.0), uSoft);
-      gl_FragColor = vec4(mix(uColorA, uColorB, vLane), a * vAlpha * uOpacity);
+      // The exhaust comes in dense and orange and leaves pale and thin: what the system is designed to do to it.
+      float clean = smoothstep(0.25, 0.95, vAlong);
+      gl_FragColor = vec4(mix(mix(uColorA, uColorB, vLane), uClean, clean * 0.85), a * vAlpha * uOpacity * (1.0 - clean * 0.45));
     }`;
   const flows = [], body = [];
   function flow({ kind, streaks, trail, length, a, b, size, opacity, speed, soft }) {
@@ -300,7 +304,7 @@ export function buildVajra(S) {
     const m = new THREE.ShaderMaterial({
       vertexShader: flowVertex, fragmentShader: flowFragment, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false,
       uniforms: { uTime: { value: 0 }, uKind: { value: kind }, uSize: { value: size }, uScale: { value: 1 }, uTrail: { value: length }, uSoft: { value: soft },
-        uOpacity: { value: 0 }, uColorA: { value: new THREE.Color(a) }, uColorB: { value: new THREE.Color(b) } },
+        uOpacity: { value: 0 }, uColorA: { value: new THREE.Color(a) }, uColorB: { value: new THREE.Color(b) }, uClean: { value: new THREE.Color(0xdfeaf0) } },
     });
     m.userData.opacity = opacity;
     const pts = new THREE.Points(g, m);
